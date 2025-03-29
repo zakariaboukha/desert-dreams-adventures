@@ -12,12 +12,19 @@ const Contact: React.FC = () => {
       <Navbar />
       
       {/* Header */}
-      <div className="pt-32 pb-20 md:pt-40 md:pb-28 bg-secondary">
-        <div className="container-custom text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+      <div 
+        className="pt-32 pb-20 md:pt-40 md:pb-28 bg-secondary relative"
+        style={{ 
+          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.1)), url(/images/4x4-desert-3.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="container-custom text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
             Contact Us
           </h1>
-          <p className="text-xl text-foreground/80 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto">
             Have questions or ready to plan your adventure? Get in touch with our team.
           </p>
         </div>

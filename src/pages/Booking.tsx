@@ -30,12 +30,19 @@ const Booking: React.FC = () => {
       <Navbar />
       
       {/* Header */}
-      <div className="pt-32 pb-20 md:pt-40 md:pb-28 bg-secondary">
-        <div className="container-custom text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+      <div 
+        className="pt-32 pb-20 md:pt-40 md:pb-28 relative"
+        style={{ 
+          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(/images/expedition-2.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="container-custom text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
             Book Your Desert Adventure
           </h1>
-          <p className="text-xl text-foreground/80 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto">
             Ready to experience the magic of the desert? Start your journey by booking your perfect tour.
           </p>
         </div>

@@ -14,7 +14,7 @@ const About: React.FC = () => {
       <div 
         className="relative pt-32 pb-20 md:pt-40 md:pb-28"
         style={{ 
-          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(/images/about-header.jpg)',
+          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(/images/expedition-1.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
@@ -206,7 +206,7 @@ const About: React.FC = () => {
       <section 
         className="py-20 relative" 
         style={{ 
-          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(/images/testimonial-banner.jpg)',
+          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url(/images/desert-dunes-2.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed'

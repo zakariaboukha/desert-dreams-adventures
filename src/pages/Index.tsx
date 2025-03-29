@@ -23,9 +23,6 @@ const Index: React.FC = () => {
       {/* Hero Section */}
       <Hero />
       
-      {/* Features Section */}
-      <FeatureSection />
-      
       {/* Featured Destinations */}
       <section className="py-20">
         <div className="container-custom">
@@ -73,6 +70,9 @@ const Index: React.FC = () => {
           <ImageGallery limit={6} />
         </div>
       </section>
+      
+      {/* Features Section - Moved below Desert Image Gallery */}
+      <FeatureSection />
       
       {/* Adventure Stats */}
       <section className="py-16 bg-background">
