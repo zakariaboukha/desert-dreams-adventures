@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Sun, Moon, Laptop } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   // Handle scroll event to change navbar appearance
   useEffect(() => {
@@ -23,20 +23,8 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleTheme = () => {
-    if (theme === 'dark') {
-      setTheme('light');
-    } else if (theme === 'light') {
-      setTheme('system');
-    } else {
-      setTheme('dark');
-    }
-  };
-
   const getThemeIcon = () => {
-    if (theme === 'dark') return <Sun size={20} />;
-    if (theme === 'light') return <Moon size={20} />;
-    return <Laptop size={20} />;
+    return theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
   };
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -71,7 +59,7 @@ const Navbar: React.FC = () => {
             onClick={toggleTheme}
             className="p-2 rounded-full hover:bg-secondary/50 transition-all"
             aria-label="Toggle theme"
-            title={`Current theme: ${theme}`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
             {getThemeIcon()}
           </button>
