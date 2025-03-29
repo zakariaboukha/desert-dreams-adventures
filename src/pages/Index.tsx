@@ -7,6 +7,7 @@ import DestinationCard from '@/components/DestinationCard';
 import TestimonialSection from '@/components/TestimonialSection';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
+import ImageGallery from '@/components/ImageGallery';
 import { destinations } from '@/data/destinations';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -59,8 +60,22 @@ const Index: React.FC = () => {
         </div>
       </section>
       
-      {/* Adventure Stats */}
+      {/* Desert Image Gallery */}
       <section className="py-16 bg-secondary">
+        <div className="container-custom">
+          <div className="text-center mb-12">
+            <h2 className="section-heading">Explore the Desert</h2>
+            <p className="section-subheading mx-auto">
+              Breathtaking landscapes and powerful 4x4 adventures await
+            </p>
+          </div>
+          
+          <ImageGallery limit={6} />
+        </div>
+      </section>
+      
+      {/* Adventure Stats */}
+      <section className="py-16 bg-background">
         <div className="container-custom">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="space-y-2">

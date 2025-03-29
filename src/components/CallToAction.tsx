@@ -10,7 +10,7 @@ const CallToAction: React.FC = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center z-0"
         style={{ 
-          backgroundImage: 'url(/images/desert-sunset.jpg)',
+          backgroundImage: 'url(/images/desert-dunes-2.jpg)',
           backgroundAttachment: 'fixed'
         }}
       >

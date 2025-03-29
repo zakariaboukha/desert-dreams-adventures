@@ -52,7 +52,7 @@ const Destinations: React.FC = () => {
       <div 
         className="relative pt-32 pb-20 md:pt-40 md:pb-28"
         style={{ 
-          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.1)), url(/images/destinations-header.jpg)',
+          backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.1)), url(/images/4x4-desert-1.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}

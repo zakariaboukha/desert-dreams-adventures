@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon, Laptop } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   // Handle scroll event to change navbar appearance
   useEffect(() => {
@@ -22,31 +23,20 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check for system dark mode preference
-  useEffect(() => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
+  const toggleTheme = () => {
+    if (theme === 'dark') {
+      setTheme('light');
+    } else if (theme === 'light') {
+      setTheme('system');
+    } else {
+      setTheme('dark');
     }
+  };
 
-    // Listen for changes in color scheme preference
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsDarkMode(e.matches);
-      if (e.matches) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
+  const getThemeIcon = () => {
+    if (theme === 'dark') return <Sun size={20} />;
+    if (theme === 'light') return <Moon size={20} />;
+    return <Laptop size={20} />;
   };
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -78,11 +68,12 @@ const Navbar: React.FC = () => {
             Contact
           </Link>
           <button
-            onClick={toggleDarkMode}
+            onClick={toggleTheme}
             className="p-2 rounded-full hover:bg-secondary/50 transition-all"
-            aria-label="Toggle dark mode"
+            aria-label="Toggle theme"
+            title={`Current theme: ${theme}`}
           >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            {getThemeIcon()}
           </button>
           <Link to="/booking" className="btn-primary">
             Book Now
@@ -92,11 +83,11 @@ const Navbar: React.FC = () => {
         {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden">
           <button
-            onClick={toggleDarkMode}
+            onClick={toggleTheme}
             className="p-2 mr-2 rounded-full hover:bg-secondary/50 transition-all"
-            aria-label="Toggle dark mode"
+            aria-label="Toggle theme"
           >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            {getThemeIcon()}
           </button>
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}

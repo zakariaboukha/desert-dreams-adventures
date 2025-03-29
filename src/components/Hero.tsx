@@ -10,7 +10,7 @@ const Hero: React.FC = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center z-0"
         style={{ 
-          backgroundImage: 'url(/images/desert-hero.jpg)',
+          backgroundImage: 'url(/images/desert-dunes-1.jpg)',
           backgroundAttachment: 'fixed'
         }}
       >
