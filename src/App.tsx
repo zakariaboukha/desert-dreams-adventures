@@ -14,6 +14,14 @@ import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
 import NotFound from "./pages/NotFound";
 
+// Admin Pages
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminExcursions from "./pages/admin/Excursions";
+import AdminCategories from "./pages/admin/Categories";
+import AdminUsers from "./pages/admin/Users";
+import AdminBookings from "./pages/admin/Bookings";
+import AdminSettings from "./pages/admin/Settings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -25,12 +33,23 @@ const App = () => (
             <Toaster />
             <Sonner />
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<Index />} />
               <Route path="/destinations" element={<Destinations />} />
               <Route path="/destinations/:id" element={<DestinationDetail />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/booking" element={<Booking />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/excursions" element={<AdminExcursions />} />
+              <Route path="/admin/categories" element={<AdminCategories />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/bookings" element={<AdminBookings />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
+              
+              {/* 404 Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </TooltipProvider>
