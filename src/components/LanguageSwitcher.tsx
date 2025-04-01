@@ -5,15 +5,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Globe } from 'lucide-react';
 
 const LanguageSwitcher: React.FC = () => {
-  const { language, changeLanguage } = useLanguage();
+  const { language, changeLanguage, isRTL } = useLanguage();
   
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center p-2 rounded-full hover:bg-secondary/50 transition-all">
         <Globe className="h-5 w-5" />
-        <span className="ml-1 md:ml-2 text-sm hidden md:inline-block">{languages[language].flag}</span>
+        <span className={`${isRTL ? 'mr-1 md:mr-2' : 'ml-1 md:ml-2'} text-sm hidden md:inline-block`}>
+          {languages[language].flag}
+        </span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align={isRTL ? "start" : "end"}>
         {Object.entries(languages).map(([code, { nativeName, flag }]) => (
           <DropdownMenuItem 
             key={code}

@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Calendar, Users, Map, DollarSign } from "lucide-react";
@@ -25,8 +25,12 @@ import {
   Pie,
   Cell
 } from 'recharts';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Dashboard = () => {
+  const { t } = useTranslation();
+  const { isRTL } = useLanguage();
+
   // Sample data for charts
   const bookingTrend = [
     { name: 'Jan', bookings: 40 },
@@ -101,11 +105,11 @@ const Dashboard = () => {
     <AdminLayout>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{t('admin.dashboard')}</h2>
           <div className="flex items-center space-x-2">
-            <Calendar className="mr-2 h-4 w-4 opacity-50" />
+            <Calendar className={`h-4 w-4 opacity-50 ${isRTL ? 'ml-2' : 'mr-2'}`} />
             <span className="text-sm text-muted-foreground">
-              {new Date().toLocaleDateString('en-US', { 
+              {new Date().toLocaleDateString(isRTL ? 'ar' : 'en-US', { 
                 month: 'long', 
                 day: 'numeric', 
                 year: 'numeric' 
@@ -116,9 +120,9 @@ const Dashboard = () => {
         
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="overview">{t('admin.overview')}</TabsTrigger>
+            <TabsTrigger value="analytics">{t('admin.analytics')}</TabsTrigger>
+            <TabsTrigger value="reports">{t('admin.reports')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="space-y-4">
@@ -127,9 +131,9 @@ const Dashboard = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle>Booking Overview</CardTitle>
+                  <CardTitle>{t('admin.booking_overview')}</CardTitle>
                   <CardDescription>
-                    Monthly booking trends for the current year
+                    {t('admin.monthly_booking')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pl-2">
@@ -158,9 +162,9 @@ const Dashboard = () => {
               
               <Card className="col-span-3">
                 <CardHeader>
-                  <CardTitle>Popular Excursions</CardTitle>
+                  <CardTitle>{t('admin.popular_excursions')}</CardTitle>
                   <CardDescription>
-                    Most booked excursions this month
+                    {t('admin.most_booked')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -172,9 +176,9 @@ const Dashboard = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle>Recent Bookings</CardTitle>
+                  <CardTitle>{t('admin.recent_bookings')}</CardTitle>
                   <CardDescription>
-                    Latest customer reservations
+                    {t('admin.latest_reservations')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -184,9 +188,9 @@ const Dashboard = () => {
               
               <Card className="col-span-3">
                 <CardHeader>
-                  <CardTitle>Revenue Overview</CardTitle>
+                  <CardTitle>{t('admin.revenue_overview')}</CardTitle>
                   <CardDescription>
-                    Monthly revenue for the current year
+                    {t('admin.monthly_revenue')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pl-2">
@@ -223,7 +227,7 @@ const Dashboard = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">User Demographics</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.user_demographics')}</CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -255,7 +259,7 @@ const Dashboard = () => {
               
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Popular Destinations</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.popular_destinations')}</CardTitle>
                   <Map className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -287,7 +291,7 @@ const Dashboard = () => {
               
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Revenue Sources</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('admin.revenue_sources')}</CardTitle>
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -320,8 +324,8 @@ const Dashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>User Registration Trends</CardTitle>
-                <CardDescription>New user registrations over the year</CardDescription>
+                <CardTitle>{t('admin.user_registration')}</CardTitle>
+                <CardDescription>{t('admin.new_registrations')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -348,15 +352,21 @@ const Dashboard = () => {
           <TabsContent value="reports" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Available Reports</CardTitle>
+                <CardTitle>{t('admin.available_reports')}</CardTitle>
                 <CardDescription>
-                  Generate and download detailed reports
+                  {t('admin.generate_reports')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {["Booking Summary", "Revenue Report", "Customer Analytics", 
-                    "Excursion Performance", "Marketing ROI", "Staff Performance"].map((report) => (
+                  {[
+                    t('admin.booking_summary'), 
+                    t('admin.revenue_report'), 
+                    t('admin.customer_analytics'), 
+                    t('admin.excursion_performance'), 
+                    t('admin.marketing_roi'), 
+                    t('admin.staff_performance')
+                  ].map((report) => (
                     <Card key={report} className="p-4 cursor-pointer hover:bg-muted/50 transition-colors">
                       <div className="flex items-center space-x-2">
                         <div className="bg-primary/10 p-2 rounded-full">

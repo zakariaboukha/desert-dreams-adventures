@@ -13,7 +13,8 @@ import {
   Menu, 
   X,
   Moon,
-  Sun
+  Sun,
+  Globe
 } from "lucide-react";
 import { 
   SidebarProvider, 
@@ -30,6 +31,9 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage, Language, languages } from "@/contexts/LanguageContext";
+import { useTranslation } from 'react-i18next';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -38,14 +42,16 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
+  const { language, changeLanguage, isRTL } = useLanguage();
+  const { t } = useTranslation();
   
   const navigation = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Excursions', href: '/admin/excursions', icon: Map },
-    { name: 'Categories', href: '/admin/categories', icon: Tag },
-    { name: 'Users', href: '/admin/users', icon: Users },
-    { name: 'Bookings', href: '/admin/bookings', icon: Calendar },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
+    { name: t('admin.dashboard'), href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: t('admin.excursions'), href: '/admin/excursions', icon: Map },
+    { name: t('admin.categories'), href: '/admin/categories', icon: Tag },
+    { name: t('admin.users'), href: '/admin/users', icon: Users },
+    { name: t('admin.bookings'), href: '/admin/bookings', icon: Calendar },
+    { name: t('admin.settings'), href: '/admin/settings', icon: Settings },
   ];
 
   const isActive = (path: string) => {
@@ -54,19 +60,19 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <Sidebar>
+      <div className={`flex min-h-screen w-full bg-background ${isRTL ? 'rtl' : 'ltr'}`}>
+        <Sidebar className={isRTL ? 'border-l' : 'border-r'}>
           <SidebarHeader className="flex items-center justify-between p-4 border-b">
             <Link to="/admin/dashboard" className="flex items-center space-x-2">
               <Map className="h-6 w-6 text-primary" />
-              <span className="font-bold text-xl">Desert Tours</span>
+              <span className="font-bold text-xl">{t('admin.dashboard')}</span>
             </Link>
             <SidebarTrigger />
           </SidebarHeader>
           
           <SidebarContent className="p-2">
             <SidebarGroup>
-              <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+              <SidebarGroupLabel>{t('admin.navigation')}</SidebarGroupLabel>
               <SidebarMenu>
                 {navigation.map((item) => (
                   <SidebarMenuItem key={item.name}>
@@ -76,7 +82,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                       tooltip={item.name}
                     >
                       <Link to={item.href} className="flex items-center">
-                        <item.icon className="mr-2" />
+                        <item.icon className={isRTL ? 'ml-2' : 'mr-2'} />
                         <span>{item.name}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -98,19 +104,20 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <p className="text-xs text-muted-foreground">admin@deserttours.com</p>
                 </div>
               </div>
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} 
-                className="ml-auto"
-              >
-                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} 
+                >
+                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
             
             <Button variant="outline" className="w-full flex items-center justify-center gap-2">
               <LogOut className="h-4 w-4" />
-              <span>Sign Out</span>
+              <span>{t('admin.sign_out')}</span>
             </Button>
           </SidebarFooter>
         </Sidebar>
@@ -124,8 +131,28 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <h1 className="font-semibold text-lg">Desert Tours Admin</h1>
             </div>
             <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="mr-2">
+                    <Globe className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {['en', 'fr', 'ar'].map((lang) => (
+                    <DropdownMenuItem 
+                      key={lang}
+                      onClick={() => changeLanguage(lang as Language)}
+                      className={`flex items-center gap-2 ${language === lang ? 'bg-secondary/50' : ''} cursor-pointer`}
+                    >
+                      <span>{languages[lang as Language].flag}</span>
+                      <span>{languages[lang as Language].nativeName}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
               <Button variant="outline" asChild>
-                <Link to="/" target="_blank">View Site</Link>
+                <Link to="/" target="_blank">{t('admin.view_site')}</Link>
               </Button>
             </div>
           </header>

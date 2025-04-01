@@ -91,8 +91,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem('language', lang);
   };
 
+  const contextValue: LanguageContextType = {
+    language,
+    changeLanguage,
+    isRTL
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, changeLanguage, isRTL }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );
