@@ -28,6 +28,7 @@ export const languages: Record<Language, LanguageDefinition> = {
 interface LanguageContextType {
   language: Language;
   changeLanguage: (lang: Language) => void;
+  isRTL: boolean; // Add this property to fix the errors
 }
 
 // Initialize i18n
@@ -51,12 +52,20 @@ i18n
     }
   });
 
-// Create context with null as initial value
-const LanguageContext = createContext<LanguageContextType | null>(null);
+// Create context with a default value to avoid the infinite type instantiation
+const LanguageContext = createContext<LanguageContextType>({
+  language: 'en',
+  changeLanguage: () => {},
+  isRTL: false
+});
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
   const [language, setLanguage] = useState<Language>('en');
+  
+  // RTL languages would be added here if needed
+  const rtlLanguages: Language[] = [];
+  const isRTL = rtlLanguages.includes(language);
 
   useEffect(() => {
     // Initialize from localStorage or browser preference
@@ -78,7 +87,8 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const contextValue: LanguageContextType = {
     language,
-    changeLanguage
+    changeLanguage,
+    isRTL
   };
 
   return (
@@ -90,7 +100,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
-  if (context === null) {
+  if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
