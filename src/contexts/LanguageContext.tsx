@@ -56,7 +56,8 @@ i18n
     }
   });
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+// Explicitly define the context with null as initial value
+const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
@@ -112,7 +113,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
-  if (context === undefined) {
+  if (context === null) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
