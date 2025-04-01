@@ -53,11 +53,14 @@ i18n
   });
 
 // Create context with a default value to avoid the infinite type instantiation
-const LanguageContext = createContext<LanguageContextType>({
+// Using type assertion to avoid the circular reference issue
+const defaultContextValue: LanguageContextType = {
   language: 'en',
   changeLanguage: () => {},
   isRTL: false
-});
+};
+
+const LanguageContext = createContext<LanguageContextType>(defaultContextValue);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
