@@ -3,8 +3,9 @@ import React from 'react';
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, UserPlus } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { UsersTable } from "@/components/admin/UsersTable";
+import { AddUserDialog } from "@/components/admin/AddUserDialog";
 
 const Users = () => {
   return (
@@ -12,10 +13,7 @@ const Users = () => {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight">Users</h2>
-          <Button className="flex items-center gap-2">
-            <UserPlus className="h-4 w-4" />
-            <span>Add User</span>
-          </Button>
+          <AddUserDialog />
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">

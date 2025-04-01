@@ -15,7 +15,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [theme, setTheme] = useState<Theme>(() => {
     // Try to get the theme from localStorage
     const savedTheme = localStorage.getItem('theme') as Theme;
-    return savedTheme === 'dark' ? 'dark' : 'light'; // Default to light if nothing saved or invalid value
+    // Default to light if nothing saved or invalid value
+    return savedTheme === 'dark' ? 'dark' : 'light'; 
   });
 
   const toggleTheme = () => {
