@@ -7,11 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Search, Filter } from "lucide-react";
 import { ExcursionsTable } from "@/components/admin/ExcursionsTable";
 import { AddExcursionDialog } from "@/components/admin/AddExcursionDialog";
-import { useLanguage } from '@/contexts/LanguageContext';
 
 const Excursions = () => {
   const { t } = useTranslation();
-  const { isRTL } = useLanguage();
   
   return (
     <AdminLayout>
@@ -23,10 +21,10 @@ const Excursions = () => {
 
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder={t('admin.search_excursions')}
-              className={`${isRTL ? 'pr-10' : 'pl-10'} w-full`}
+              className="pl-10 w-full"
             />
           </div>
           <div className="flex gap-2">

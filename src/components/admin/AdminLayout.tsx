@@ -42,7 +42,7 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
-  const { language, changeLanguage, isRTL } = useLanguage();
+  const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
   
   const navigation = [
@@ -60,8 +60,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className={`flex min-h-screen w-full bg-background ${isRTL ? 'rtl' : 'ltr'}`}>
-        <Sidebar className={isRTL ? 'border-l' : 'border-r'}>
+      <div className="flex min-h-screen w-full bg-background">
+        <Sidebar className="border-r">
           <SidebarHeader className="flex items-center justify-between p-4 border-b">
             <Link to="/admin/dashboard" className="flex items-center space-x-2">
               <Map className="h-6 w-6 text-primary" />
@@ -82,7 +82,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                       tooltip={item.name}
                     >
                       <Link to={item.href} className="flex items-center">
-                        <item.icon className={isRTL ? 'ml-2' : 'mr-2'} />
+                        <item.icon className="mr-2" />
                         <span>{item.name}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -138,7 +138,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {['en', 'fr', 'ar'].map((lang) => (
+                  {['en', 'fr'].map((lang) => (
                     <DropdownMenuItem 
                       key={lang}
                       onClick={() => changeLanguage(lang as Language)}

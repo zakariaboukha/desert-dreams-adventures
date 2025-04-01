@@ -9,29 +9,25 @@ import enTranslations from '../locales/en.json';
 import esTranslations from '../locales/es.json';
 import frTranslations from '../locales/fr.json';
 import deTranslations from '../locales/de.json';
-import arTranslations from '../locales/ar.json';
 
 // Define types
-export type Language = 'en' | 'es' | 'fr' | 'de' | 'ar';
+export type Language = 'en' | 'es' | 'fr' | 'de';
 
 type LanguageDefinition = {
   nativeName: string;
   flag: string;
-  dir: 'ltr' | 'rtl';
 };
 
 export const languages: Record<Language, LanguageDefinition> = {
-  en: { nativeName: 'English', flag: '🇬🇧', dir: 'ltr' },
-  es: { nativeName: 'Español', flag: '🇪🇸', dir: 'ltr' },
-  fr: { nativeName: 'Français', flag: '🇫🇷', dir: 'ltr' },
-  de: { nativeName: 'Deutsch', flag: '🇩🇪', dir: 'ltr' },
-  ar: { nativeName: 'العربية', flag: '🇸🇦', dir: 'rtl' }
+  en: { nativeName: 'English', flag: '🇬🇧' },
+  es: { nativeName: 'Español', flag: '🇪🇸' },
+  fr: { nativeName: 'Français', flag: '🇫🇷' },
+  de: { nativeName: 'Deutsch', flag: '🇩🇪' }
 };
 
 interface LanguageContextType {
   language: Language;
   changeLanguage: (lang: Language) => void;
-  isRTL: boolean;
 }
 
 // Initialize i18n
@@ -43,8 +39,7 @@ i18n
       en: { translation: enTranslations },
       es: { translation: esTranslations },
       fr: { translation: frTranslations },
-      de: { translation: deTranslations },
-      ar: { translation: arTranslations }
+      de: { translation: deTranslations }
     },
     fallbackLng: 'en',
     interpolation: {
@@ -56,13 +51,12 @@ i18n
     }
   });
 
-// Explicitly define the context with null as initial value
+// Create context with null as initial value
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
   const [language, setLanguage] = useState<Language>('en');
-  const [isRTL, setIsRTL] = useState(false);
 
   useEffect(() => {
     // Initialize from localStorage or browser preference
@@ -76,22 +70,6 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [i18n]);
 
-  useEffect(() => {
-    // Check if language is RTL
-    const isRightToLeft = language === 'ar';
-    setIsRTL(isRightToLeft);
-    
-    // Apply RTL or LTR to HTML
-    document.documentElement.dir = isRightToLeft ? 'rtl' : 'ltr';
-    
-    // Add or remove RTL class from body
-    if (isRightToLeft) {
-      document.body.classList.add('rtl');
-    } else {
-      document.body.classList.remove('rtl');
-    }
-  }, [language]);
-
   const changeLanguage = (lang: Language) => {
     i18n.changeLanguage(lang);
     setLanguage(lang);
@@ -100,8 +78,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const contextValue: LanguageContextType = {
     language,
-    changeLanguage,
-    isRTL
+    changeLanguage
   };
 
   return (
