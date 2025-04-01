@@ -14,7 +14,13 @@ import arTranslations from '../locales/ar.json';
 // Define types
 export type Language = 'en' | 'es' | 'fr' | 'de' | 'ar';
 
-export const languages: Record<Language, { nativeName: string; flag: string; dir: 'ltr' | 'rtl' }> = {
+type LanguageDefinition = {
+  nativeName: string;
+  flag: string;
+  dir: 'ltr' | 'rtl';
+};
+
+export const languages: Record<Language, LanguageDefinition> = {
   en: { nativeName: 'English', flag: '🇬🇧', dir: 'ltr' },
   es: { nativeName: 'Español', flag: '🇪🇸', dir: 'ltr' },
   fr: { nativeName: 'Français', flag: '🇫🇷', dir: 'ltr' },
