@@ -11,8 +11,11 @@ import ImageGallery from '@/components/ImageGallery';
 import { destinations } from '@/data/destinations';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Index: React.FC = () => {
+  const { t } = useTranslation();
+  
   // Featured destinations (show only 3 for the homepage)
   const featuredDestinations = destinations.slice(0, 3);
   
@@ -27,9 +30,9 @@ const Index: React.FC = () => {
       <section className="py-20">
         <div className="container-custom">
           <div className="text-center mb-16">
-            <h2 className="section-heading">Featured Adventures</h2>
+            <h2 className="section-heading">{t('featured.title')}</h2>
             <p className="section-subheading mx-auto">
-              Discover our most popular desert experiences
+              {t('featured.subtitle')}
             </p>
           </div>
           
@@ -50,7 +53,7 @@ const Index: React.FC = () => {
           
           <div className="text-center mt-12">
             <Link to="/destinations" className="btn-secondary inline-flex items-center">
-              View All Destinations
+              {t('featured.view_all')}
               <ArrowRight className="ml-2" size={18} />
             </Link>
           </div>
@@ -61,9 +64,9 @@ const Index: React.FC = () => {
       <section className="py-16 bg-secondary">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="section-heading">Explore the Desert</h2>
+            <h2 className="section-heading">{t('explore.title')}</h2>
             <p className="section-subheading mx-auto">
-              Breathtaking landscapes and powerful 4x4 adventures await
+              {t('explore.subtitle')}
             </p>
           </div>
           
@@ -80,19 +83,19 @@ const Index: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="space-y-2">
               <div className="text-4xl font-bold text-primary">15+</div>
-              <p className="text-foreground/80">Desert Tours</p>
+              <p className="text-foreground/80">{t('stats.tours')}</p>
             </div>
             <div className="space-y-2">
               <div className="text-4xl font-bold text-primary">5000+</div>
-              <p className="text-foreground/80">Happy Adventurers</p>
+              <p className="text-foreground/80">{t('stats.adventurers')}</p>
             </div>
             <div className="space-y-2">
               <div className="text-4xl font-bold text-primary">12+</div>
-              <p className="text-foreground/80">Years of Experience</p>
+              <p className="text-foreground/80">{t('stats.experience')}</p>
             </div>
             <div className="space-y-2">
               <div className="text-4xl font-bold text-primary">20+</div>
-              <p className="text-foreground/80">Expert Guides</p>
+              <p className="text-foreground/80">{t('stats.guides')}</p>
             </div>
           </div>
         </div>

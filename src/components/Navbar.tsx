@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { t } = useTranslation();
 
   // Handle scroll event to change navbar appearance
   useEffect(() => {
@@ -44,17 +47,18 @@ const Navbar: React.FC = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
           <Link to="/" className="text-foreground hover:text-primary transition-all">
-            Home
+            {t('navbar.home')}
           </Link>
           <Link to="/destinations" className="text-foreground hover:text-primary transition-all">
-            Destinations
+            {t('navbar.destinations')}
           </Link>
           <Link to="/about" className="text-foreground hover:text-primary transition-all">
-            About Us
+            {t('navbar.about')}
           </Link>
           <Link to="/contact" className="text-foreground hover:text-primary transition-all">
-            Contact
+            {t('navbar.contact')}
           </Link>
+          <LanguageSwitcher />
           <button
             onClick={toggleTheme}
             className="p-2 rounded-full hover:bg-secondary/50 transition-all"
@@ -64,12 +68,13 @@ const Navbar: React.FC = () => {
             {getThemeIcon()}
           </button>
           <Link to="/booking" className="btn-primary">
-            Book Now
+            {t('common.book_now')}
           </Link>
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden">
+          <LanguageSwitcher />
           <button
             onClick={toggleTheme}
             className="p-2 mr-2 rounded-full hover:bg-secondary/50 transition-all"
@@ -94,35 +99,35 @@ const Navbar: React.FC = () => {
                 className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Home
+                {t('navbar.home')}
               </Link>
               <Link
                 to="/destinations"
                 className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Destinations
+                {t('navbar.destinations')}
               </Link>
               <Link
                 to="/about"
                 className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
-                About Us
+                {t('navbar.about')}
               </Link>
               <Link
                 to="/contact"
                 className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Contact
+                {t('navbar.contact')}
               </Link>
               <Link
                 to="/booking"
                 className="btn-primary mx-4"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Book Now
+                {t('common.book_now')}
               </Link>
             </div>
           </div>

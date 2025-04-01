@@ -2,8 +2,11 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Hero: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="relative min-h-screen flex items-center">
       {/* Hero Background */}
@@ -22,19 +25,24 @@ const Hero: React.FC = () => {
       <div className="container-custom relative z-10">
         <div className="max-w-3xl animate-fade-in">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Discover the Magic of the <span className="text-primary">Desert</span>
+            {t('hero.title').split('Desert').map((part, index, array) => 
+              index === array.length - 1 ? 
+                <React.Fragment key={index}>{part}</React.Fragment> : 
+                <React.Fragment key={index}>
+                  {part}<span className="text-primary">Desert</span>
+                </React.Fragment>
+            )}
           </h1>
           <p className="text-lg md:text-xl mb-8 text-foreground/90 max-w-2xl">
-            Experience unforgettable adventures through golden dunes and breathtaking landscapes. 
-            Our 4x4 excursions bring you the best of Sahara's beauty.
+            {t('hero.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/destinations" className="btn-primary group">
-              Explore Destinations
+              {t('common.explore_destinations')}
               <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
             </Link>
             <Link to="/contact" className="btn-secondary">
-              Contact Us
+              {t('common.contact_us')}
             </Link>
           </div>
         </div>

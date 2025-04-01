@@ -1,0 +1,51 @@
+
+{
+  "common": {
+    "book_now": "Jetzt Buchen",
+    "contact_us": "Kontaktieren Sie Uns",
+    "explore_destinations": "Entdecken Sie Ziele"
+  },
+  "navbar": {
+    "home": "Startseite",
+    "destinations": "Reiseziele",
+    "about": "Über Uns",
+    "contact": "Kontakt"
+  },
+  "hero": {
+    "title": "Entdecken Sie die Magie der Wüste",
+    "description": "Erleben Sie unvergessliche Abenteuer durch goldene Dünen und atemberaubende Landschaften. Unsere 4x4-Exkursionen bringen Ihnen das Beste der Schönheit der Sahara."
+  },
+  "featured": {
+    "title": "Empfohlene Abenteuer",
+    "subtitle": "Entdecken Sie unsere beliebtesten Wüstenerlebnisse",
+    "view_all": "Alle Reiseziele Anzeigen"
+  },
+  "explore": {
+    "title": "Erkunden Sie die Wüste",
+    "subtitle": "Atemberaubende Landschaften und leistungsstarke 4x4-Abenteuer warten auf Sie"
+  },
+  "stats": {
+    "tours": "Wüstentouren",
+    "adventurers": "Glückliche Abenteurer",
+    "experience": "Jahre Erfahrung",
+    "guides": "Erfahrene Guides"
+  },
+  "cta": {
+    "title": "Bereit für Ihr Wüstenabenteuer?",
+    "description": "Buchen Sie Ihre Traumexpedition noch heute und erleben Sie die Magie der Wüste mit unseren erfahrenen Guides.",
+    "plan_trip": "Planen Sie Ihre Reise"
+  },
+  "footer": {
+    "description": "Entdecken Sie den Zauber von Wüstenabenteuern mit unseren Premium-Touren und Ausflügen.",
+    "quick_links": "Schnellzugriff",
+    "popular_tours": "Beliebte Touren",
+    "contact_us": "Kontaktieren Sie Uns"
+  },
+  "contact": {
+    "get_in_touch": "Kontaktieren Sie Uns",
+    "our_location": "Unser Standort",
+    "email_us": "Schreiben Sie Uns",
+    "call_us": "Rufen Sie Uns An",
+    "office_hours": "Geschäftszeiten"
+  }
+}

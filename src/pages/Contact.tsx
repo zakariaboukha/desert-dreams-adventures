@@ -5,8 +5,11 @@ import Footer from '@/components/Footer';
 import ContactForm from '@/components/ContactForm';
 import GoogleMap from '@/components/GoogleMap';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Contact: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -22,7 +25,7 @@ const Contact: React.FC = () => {
       >
         <div className="container-custom text-center relative z-10">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-            Contact Us
+            {t('navbar.contact')}
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
             Have questions or ready to plan your adventure? Get in touch with our team.
@@ -36,7 +39,7 @@ const Contact: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Information */}
             <div>
-              <h2 className="text-2xl font-bold mb-6">Get In Touch</h2>
+              <h2 className="text-2xl font-bold mb-6">{t('contact.get_in_touch')}</h2>
               <p className="text-foreground/80 mb-8">
                 We're here to help you plan your perfect desert adventure. Contact us through the form or using the information below.
               </p>
@@ -47,7 +50,7 @@ const Contact: React.FC = () => {
                     <MapPin className="text-primary" size={24} />
                   </div>
                   <div>
-                    <h3 className="font-bold mb-1">Our Location</h3>
+                    <h3 className="font-bold mb-1">{t('contact.our_location')}</h3>
                     <p className="text-foreground/80">
                       123 Desert Road, Oasis City<br />
                       Sahara Desert
@@ -60,7 +63,7 @@ const Contact: React.FC = () => {
                     <Mail className="text-primary" size={24} />
                   </div>
                   <div>
-                    <h3 className="font-bold mb-1">Email Us</h3>
+                    <h3 className="font-bold mb-1">{t('contact.email_us')}</h3>
                     <p className="text-foreground/80">
                       info@desertdreams.com<br />
                       bookings@desertdreams.com
@@ -73,7 +76,7 @@ const Contact: React.FC = () => {
                     <Phone className="text-primary" size={24} />
                   </div>
                   <div>
-                    <h3 className="font-bold mb-1">Call Us</h3>
+                    <h3 className="font-bold mb-1">{t('contact.call_us')}</h3>
                     <p className="text-foreground/80">
                       +1 234 567 8900<br />
                       +1 234 567 8901
@@ -86,7 +89,7 @@ const Contact: React.FC = () => {
                     <Clock className="text-primary" size={24} />
                   </div>
                   <div>
-                    <h3 className="font-bold mb-1">Office Hours</h3>
+                    <h3 className="font-bold mb-1">{t('contact.office_hours')}</h3>
                     <p className="text-foreground/80">
                       Monday - Friday: 9:00 AM - 6:00 PM<br />
                       Saturday: 10:00 AM - 4:00 PM<br />

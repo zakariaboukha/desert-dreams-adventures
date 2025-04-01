@@ -1,0 +1,51 @@
+
+{
+  "common": {
+    "book_now": "Book Now",
+    "contact_us": "Contact Us",
+    "explore_destinations": "Explore Destinations"
+  },
+  "navbar": {
+    "home": "Home",
+    "destinations": "Destinations",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Discover the Magic of the Desert",
+    "description": "Experience unforgettable adventures through golden dunes and breathtaking landscapes. Our 4x4 excursions bring you the best of Sahara's beauty."
+  },
+  "featured": {
+    "title": "Featured Adventures",
+    "subtitle": "Discover our most popular desert experiences",
+    "view_all": "View All Destinations"
+  },
+  "explore": {
+    "title": "Explore the Desert",
+    "subtitle": "Breathtaking landscapes and powerful 4x4 adventures await"
+  },
+  "stats": {
+    "tours": "Desert Tours",
+    "adventurers": "Happy Adventurers",
+    "experience": "Years of Experience",
+    "guides": "Expert Guides"
+  },
+  "cta": {
+    "title": "Ready for Your Desert Adventure?",
+    "description": "Book your dream expedition today and experience the magic of the desert with our expert guides.",
+    "plan_trip": "Plan Your Trip"
+  },
+  "footer": {
+    "description": "Discover the magic of desert adventures with our premium tours and excursions.",
+    "quick_links": "Quick Links",
+    "popular_tours": "Popular Tours",
+    "contact_us": "Contact Us"
+  },
+  "contact": {
+    "get_in_touch": "Get In Touch",
+    "our_location": "Our Location",
+    "email_us": "Email Us",
+    "call_us": "Call Us",
+    "office_hours": "Office Hours"
+  }
+}
