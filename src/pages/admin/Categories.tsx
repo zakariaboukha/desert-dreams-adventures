@@ -1,15 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { CategoriesTable } from "@/components/admin/CategoriesTable";
 import { AddCategoryDialog } from "@/components/admin/AddCategoryDialog";
+import { AdminSearch } from "@/components/admin/AdminSearch";
+import { Toaster } from "@/components/ui/toaster";
 
 const Categories = () => {
   const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState('');
   
   return (
     <AdminLayout>
@@ -20,17 +20,15 @@ const Categories = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder={t('admin.search_categories')} 
-              className="pl-10 w-full" 
-            />
-          </div>
+          <AdminSearch 
+            placeholder={t('admin.search_categories')}
+            onSearch={setSearchQuery}
+          />
         </div>
 
-        <CategoriesTable />
+        <CategoriesTable searchQuery={searchQuery} />
       </div>
+      <Toaster />
     </AdminLayout>
   );
 };

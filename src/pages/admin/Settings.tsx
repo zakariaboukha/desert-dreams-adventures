@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,11 +7,92 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save, RefreshCcw } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const siteInfoSchema = z.object({
+  siteName: z.string().min(2, { message: "Site name is required" }),
+  siteTagline: z.string().min(2, { message: "Site tagline is required" }),
+  siteDescription: z.string().min(10, { message: "Description must be at least 10 characters" }),
+});
+
+const contactInfoSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  phone: z.string().min(7, { message: "Phone number is required" }),
+  address: z.string().min(5, { message: "Address is required" }),
+  city: z.string().min(2, { message: "City is required" }),
+});
 
 const Settings = () => {
+  const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const siteInfoForm = useForm<z.infer<typeof siteInfoSchema>>({
+    resolver: zodResolver(siteInfoSchema),
+    defaultValues: {
+      siteName: "Desert Tours",
+      siteTagline: "Experience the Desert",
+      siteDescription: "Desert Tours offers exciting and authentic desert experiences for adventure lovers.",
+    },
+  });
+
+  const contactInfoForm = useForm<z.infer<typeof contactInfoSchema>>({
+    resolver: zodResolver(contactInfoSchema),
+    defaultValues: {
+      email: "contact@deserttours.com",
+      phone: "+1 234 567 8901",
+      address: "123 Desert Road",
+      city: "Sahara City",
+    },
+  });
+
+  const onSaveSiteInfo = (data: z.infer<typeof siteInfoSchema>) => {
+    setIsSaving(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      toast({
+        title: "Site info saved",
+        description: "Your changes have been saved successfully.",
+      });
+    }, 1000);
+  };
+
+  const onSaveContactInfo = (data: z.infer<typeof contactInfoSchema>) => {
+    setIsSaving(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      toast({
+        title: "Contact info saved",
+        description: "Your changes have been saved successfully.",
+      });
+    }, 1000);
+  };
+
+  const handleResetSiteInfo = () => {
+    siteInfoForm.reset();
+  };
+
+  const handleResetContactInfo = () => {
+    contactInfoForm.reset();
+  };
+
+  const handleThemeChange = (mode: string) => {
+    setTheme(mode === "dark" ? "dark" : "light");
+  };
+
   return (
     <AdminLayout>
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-h-[calc(100vh-184px)] overflow-y-auto">
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
         </div>
@@ -26,74 +107,150 @@ const Settings = () => {
           
           <TabsContent value="general" className="space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle>Site Information</CardTitle>
-                <CardDescription>
-                  Manage your site's basic information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="site-name" className="text-sm font-medium">Site Name</label>
-                    <Input id="site-name" placeholder="Desert Tours" defaultValue="Desert Tours" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="site-tagline" className="text-sm font-medium">Site Tagline</label>
-                    <Input id="site-tagline" placeholder="Experience the Desert" defaultValue="Experience the Desert" />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="site-description" className="text-sm font-medium">Site Description</label>
-                  <textarea 
-                    id="site-description" 
-                    placeholder="Enter site description..." 
-                    defaultValue="Desert Tours offers exciting and authentic desert experiences for adventure lovers."
-                    className="w-full min-h-[100px] p-2 rounded-md border border-input bg-background"
-                  ></textarea>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline">Reset</Button>
-                <Button>Save Changes</Button>
-              </CardFooter>
+              <Form {...siteInfoForm}>
+                <form onSubmit={siteInfoForm.handleSubmit(onSaveSiteInfo)}>
+                  <CardHeader>
+                    <CardTitle>Site Information</CardTitle>
+                    <CardDescription>
+                      Manage your site's basic information
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={siteInfoForm.control}
+                        name="siteName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Site Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={siteInfoForm.control}
+                        name="siteTagline"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Site Tagline</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={siteInfoForm.control}
+                      name="siteDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Site Description</FormLabel>
+                          <FormControl>
+                            <textarea 
+                              {...field}
+                              className="w-full min-h-[100px] p-2 rounded-md border border-input bg-background"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <Button type="button" variant="outline" onClick={handleResetSiteInfo}>Reset</Button>
+                    <Button type="submit" disabled={isSaving}>
+                      {isSaving ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </CardFooter>
+                </form>
+              </Form>
             </Card>
             
             <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-                <CardDescription>
-                  Manage your contact details
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">Email Address</label>
-                    <Input id="email" placeholder="contact@deserttours.com" defaultValue="contact@deserttours.com" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="phone" className="text-sm font-medium">Phone Number</label>
-                    <Input id="phone" placeholder="+1 234 567 8901" defaultValue="+1 234 567 8901" />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="address" className="text-sm font-medium">Address</label>
-                    <Input id="address" placeholder="123 Desert Road" defaultValue="123 Desert Road" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="city" className="text-sm font-medium">City</label>
-                    <Input id="city" placeholder="Sahara City" defaultValue="Sahara City" />
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline">Reset</Button>
-                <Button>Save Changes</Button>
-              </CardFooter>
+              <Form {...contactInfoForm}>
+                <form onSubmit={contactInfoForm.handleSubmit(onSaveContactInfo)}>
+                  <CardHeader>
+                    <CardTitle>Contact Information</CardTitle>
+                    <CardDescription>
+                      Manage your contact details
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={contactInfoForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Address</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={contactInfoForm.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={contactInfoForm.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Address</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={contactInfoForm.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <Button type="button" variant="outline" onClick={handleResetContactInfo}>Reset</Button>
+                    <Button type="submit" disabled={isSaving}>
+                      {isSaving ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </CardFooter>
+                </form>
+              </Form>
             </Card>
           </TabsContent>
           
@@ -111,15 +268,31 @@ const Settings = () => {
                     <h3 className="text-sm font-medium mb-3">Color Mode</h3>
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-2">
-                        <input type="radio" id="light-mode" name="color-mode" defaultChecked />
+                        <input 
+                          type="radio" 
+                          id="light-mode" 
+                          name="color-mode" 
+                          checked={theme === "light"} 
+                          onChange={() => handleThemeChange("light")} 
+                        />
                         <label htmlFor="light-mode">Light</label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <input type="radio" id="dark-mode" name="color-mode" />
+                        <input 
+                          type="radio" 
+                          id="dark-mode" 
+                          name="color-mode" 
+                          checked={theme === "dark"} 
+                          onChange={() => handleThemeChange("dark")}
+                        />
                         <label htmlFor="dark-mode">Dark</label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <input type="radio" id="system-mode" name="color-mode" />
+                        <input 
+                          type="radio" 
+                          id="system-mode" 
+                          name="color-mode" 
+                        />
                         <label htmlFor="system-mode">System</label>
                       </div>
                     </div>
@@ -155,7 +328,12 @@ const Settings = () => {
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button variant="outline">Reset</Button>
-                <Button>Save Changes</Button>
+                <Button onClick={() => {
+                  toast({
+                    title: "Theme settings saved",
+                    description: "Your theme settings have been saved successfully.",
+                  });
+                }}>Save Changes</Button>
               </CardFooter>
             </Card>
             
@@ -213,7 +391,12 @@ const Settings = () => {
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button variant="outline">Reset</Button>
-                <Button>Save Changes</Button>
+                <Button onClick={() => {
+                  toast({
+                    title: "Branding updated",
+                    description: "Logo and branding have been updated successfully.",
+                  });
+                }}>Save Changes</Button>
               </CardFooter>
             </Card>
           </TabsContent>
@@ -391,6 +574,7 @@ const Settings = () => {
           </TabsContent>
         </Tabs>
       </div>
+      <Toaster />
     </AdminLayout>
   );
 };

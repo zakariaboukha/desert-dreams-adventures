@@ -1,18 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Filter } from "lucide-react";
+import { Filter } from "lucide-react";
 import { ExcursionsTable } from "@/components/admin/ExcursionsTable";
 import { AddExcursionDialog } from "@/components/admin/AddExcursionDialog";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Toaster } from "@/components/ui/toaster";
+import { AdminSearch } from "@/components/admin/AdminSearch";
 
 const Excursions = () => {
   const { t } = useTranslation();
-  const { isRTL } = useLanguage();
+  const [searchQuery, setSearchQuery] = useState('');
   
   return (
     <AdminLayout>
@@ -23,13 +23,10 @@ const Excursions = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
-            <Input 
-              placeholder={t('admin.search_excursions')} 
-              className={`${isRTL ? 'pr-10' : 'pl-10'} w-full`}
-            />
-          </div>
+          <AdminSearch 
+            placeholder={t('admin.search_excursions')}
+            onSearch={setSearchQuery}
+          />
           <div className="flex gap-2">
             <Button variant="outline" className="flex gap-2">
               <Filter className="h-4 w-4" />
@@ -44,7 +41,7 @@ const Excursions = () => {
           </div>
         </div>
 
-        <ExcursionsTable />
+        <ExcursionsTable searchQuery={searchQuery} />
       </div>
       <Toaster />
     </AdminLayout>

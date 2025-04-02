@@ -52,8 +52,15 @@ i18n
     }
   });
 
-// Define the context without initializing it with a default value
-const LanguageContext = createContext<LanguageContextType | null>(null);
+// Define a default context value to avoid the circular reference
+const defaultContextValue: LanguageContextType = {
+  language: 'en',
+  changeLanguage: () => {},
+  isRTL: false
+};
+
+// Create context with the default value
+const LanguageContext = createContext<LanguageContextType>(defaultContextValue);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
