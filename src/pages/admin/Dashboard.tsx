@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RecentBookings } from "@/components/admin/RecentBookings";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { PopularExcursions } from "@/components/admin/PopularExcursions";
-import { ChartContainer } from "@/components/ui/chart";
 import { 
   ResponsiveContainer, 
   LineChart, 
