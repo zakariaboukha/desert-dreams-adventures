@@ -109,13 +109,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   variant="outline" 
                   size="icon" 
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} 
+                  className="bg-background"
                 >
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
             
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+            <Button variant="outline" className="w-full flex items-center justify-center gap-2 bg-background">
               <LogOut className="h-4 w-4" />
               <span>{t('admin.sign_out')}</span>
             </Button>
@@ -125,7 +126,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex flex-col flex-1 overflow-x-hidden">
           <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
             <div className="md:hidden">
-              <SidebarTrigger className="text-white bg-primary hover:bg-primary/90" />
+              <SidebarTrigger className="bg-background text-foreground hover:bg-background/90" />
             </div>
             <div className="flex-1">
               <h1 className="font-semibold text-lg">Desert Tours Admin</h1>
@@ -133,12 +134,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="mr-2">
+                  <Button variant="outline" size="icon" className="mr-2 bg-background">
                     <Globe className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {['en', 'fr'].map((lang) => (
+                  {Object.keys(languages).map((lang) => (
                     <DropdownMenuItem 
                       key={lang}
                       onClick={() => changeLanguage(lang as Language)}
@@ -151,7 +152,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
               
-              <Button variant="outline" asChild>
+              <Button variant="outline" asChild className="bg-background">
                 <Link to="/" target="_blank">{t('admin.view_site')}</Link>
               </Button>
             </div>
