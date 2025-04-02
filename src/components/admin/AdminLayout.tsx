@@ -10,8 +10,6 @@ import {
   Calendar, 
   Settings, 
   LogOut, 
-  Menu, 
-  X,
   Moon,
   Sun,
   Globe
@@ -45,6 +43,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
   
+  // Define navigation items outside of render function to avoid excessive type instantiation
   const navigation = [
     { name: t('admin.dashboard'), href: '/admin/dashboard', icon: LayoutDashboard },
     { name: t('admin.excursions'), href: '/admin/excursions', icon: Map },
