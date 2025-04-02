@@ -1,16 +1,17 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Eye, Edit, Trash2, Check, X } from "lucide-react";
+import { Eye, Edit, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export function BookingsTable() {
-  const [bookings, setBookings] = React.useState([
+  const [bookings, setBookings] = useState([
     {
       id: 'B-1234',
       customer: { name: 'John Doe', email: 'john.doe@example.com', avatar: '/images/avatars/john.jpg' },
@@ -59,8 +60,8 @@ export function BookingsTable() {
   ]);
 
   const { toast } = useToast();
-  const [rejectionDialogOpen, setRejectionDialogOpen] = React.useState(false);
-  const [selectedBookingId, setSelectedBookingId] = React.useState<string | null>(null);
+  const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,6 +70,10 @@ export function BookingsTable() {
       case 'cancelled': return 'text-red-600 border-red-600';
       default: return '';
     }
+  };
+
+  const handleDeleteSuccess = (bookingId: string | number) => {
+    setBookings(bookings.filter(booking => booking.id !== bookingId));
   };
 
   const handleConfirmBooking = (bookingId: string) => {
@@ -185,9 +190,12 @@ export function BookingsTable() {
                     <Button variant="ghost" size="icon">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <DeleteButton 
+                      itemId={booking.id}
+                      itemType="Booking"
+                      itemName={`${booking.customer.name}'s ${booking.excursion}`}
+                      onDeleteSuccess={handleDeleteSuccess}
+                    />
                   </div>
                 </TableCell>
               </TableRow>

@@ -1,13 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Eye } from "lucide-react";
+import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export function ExcursionsTable() {
-  const excursions = [
+  const [excursions, setExcursions] = useState([
     {
       id: 1,
       name: 'Desert Safari Adventure',
@@ -53,7 +54,11 @@ export function ExcursionsTable() {
       availability: true,
       featured: true
     }
-  ];
+  ]);
+
+  const handleDeleteSuccess = (excursionId: string | number) => {
+    setExcursions(excursions.filter(excursion => excursion.id !== excursionId));
+  };
 
   return (
     <div className="rounded-md border">
@@ -102,9 +107,12 @@ export function ExcursionsTable() {
                   <Button variant="ghost" size="icon">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <DeleteButton 
+                    itemId={excursion.id}
+                    itemType="Excursion"
+                    itemName={excursion.name}
+                    onDeleteSuccess={handleDeleteSuccess}
+                  />
                 </div>
               </TableCell>
             </TableRow>

@@ -1,14 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, UserCog } from "lucide-react";
+import { Edit, UserCog } from "lucide-react";
+import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export function UsersTable() {
-  const users = [
+  const [users, setUsers] = useState([
     {
       id: 1,
       name: 'John Doe',
@@ -54,7 +55,11 @@ export function UsersTable() {
       lastLogin: '2023-06-15 10:20',
       avatar: ''
     }
-  ];
+  ]);
+
+  const handleDeleteSuccess = (userId: string | number) => {
+    setUsers(users.filter(user => user.id !== userId));
+  };
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
@@ -117,9 +122,12 @@ export function UsersTable() {
                   <Button variant="ghost" size="icon">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <DeleteButton 
+                    itemId={user.id}
+                    itemType="User"
+                    itemName={user.name}
+                    onDeleteSuccess={handleDeleteSuccess}
+                  />
                 </div>
               </TableCell>
             </TableRow>

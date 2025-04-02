@@ -8,6 +8,7 @@ import { Search, Filter } from "lucide-react";
 import { ExcursionsTable } from "@/components/admin/ExcursionsTable";
 import { AddExcursionDialog } from "@/components/admin/AddExcursionDialog";
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Toaster } from "@/components/ui/toaster";
 
 const Excursions = () => {
   const { t } = useTranslation();
@@ -45,6 +46,7 @@ const Excursions = () => {
 
         <ExcursionsTable />
       </div>
+      <Toaster />
     </AdminLayout>
   );
 };

@@ -28,7 +28,7 @@ export const languages: Record<Language, LanguageDefinition> = {
 interface LanguageContextType {
   language: Language;
   changeLanguage: (lang: Language) => void;
-  isRTL: boolean; // Add this property to fix the errors
+  isRTL: boolean;
 }
 
 // Initialize i18n
@@ -52,15 +52,8 @@ i18n
     }
   });
 
-// Create context with a default value to avoid the infinite type instantiation
-// Using type assertion to avoid the circular reference issue
-const defaultContextValue: LanguageContextType = {
-  language: 'en',
-  changeLanguage: () => {},
-  isRTL: false
-};
-
-const LanguageContext = createContext<LanguageContextType>(defaultContextValue);
+// Define the context without initializing it with a default value
+const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
