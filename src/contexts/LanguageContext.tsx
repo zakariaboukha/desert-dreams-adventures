@@ -1,106 +1,77 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import i18n from 'i18next';
-import { initReactI18next, useTranslation } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 
-// Import language files
-import enTranslations from '../locales/en.json';
-import esTranslations from '../locales/es.json';
-import frTranslations from '../locales/fr.json';
-import deTranslations from '../locales/de.json';
+// Define the available languages
+export type Language = 'en' | 'fr';
 
-// Define types
-export type Language = 'en' | 'es' | 'fr' | 'de';
-
-type LanguageDefinition = {
+// Define the structure for language data
+interface LanguageInfo {
   nativeName: string;
   flag: string;
-};
-
-export const languages: Record<Language, LanguageDefinition> = {
-  en: { nativeName: 'English', flag: '🇬🇧' },
-  es: { nativeName: 'Español', flag: '🇪🇸' },
-  fr: { nativeName: 'Français', flag: '🇫🇷' },
-  de: { nativeName: 'Deutsch', flag: '🇩🇪' }
-};
-
-interface LanguageContextType {
-  language: Language;
-  changeLanguage: (lang: Language) => void;
-  isRTL: boolean;
 }
 
-// Initialize i18n
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources: {
-      en: { translation: enTranslations },
-      es: { translation: esTranslations },
-      fr: { translation: frTranslations },
-      de: { translation: deTranslations }
-    },
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false
-    },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage']
-    }
-  });
-
-// Define a default context value to avoid the circular reference
-const defaultContextValue: LanguageContextType = {
-  language: 'en',
-  changeLanguage: () => {},
-  isRTL: false
+// Available languages with their info
+export const languages: Record<Language, LanguageInfo> = {
+  en: {
+    nativeName: 'English',
+    flag: '🇬🇧'
+  },
+  fr: {
+    nativeName: 'Français',
+    flag: '🇫🇷'
+  }
 };
 
-// Create context with the default value
+// Define the context value type
+interface LanguageContextType {
+  language: Language;
+  changeLanguage: (lng: Language) => void;
+}
+
+// Create a default context value to avoid circular type definition
+const defaultContextValue: LanguageContextType = {
+  language: 'en',
+  changeLanguage: () => {}
+};
+
+// Create the context
 const LanguageContext = createContext<LanguageContextType>(defaultContextValue);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { i18n } = useTranslation();
-  const [language, setLanguage] = useState<Language>('en');
-  
-  // RTL languages would be added here if needed
-  const rtlLanguages: Language[] = [];
-  const isRTL = rtlLanguages.includes(language);
+// Create the provider component
+interface LanguageProviderProps {
+  children: React.ReactNode;
+}
 
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+  // Get initial language from localStorage or default to 'en'
+  const [language, setLanguage] = useState<Language>(() => {
+    const savedLanguage = localStorage.getItem('language') as Language;
+    return savedLanguage && Object.keys(languages).includes(savedLanguage) ? savedLanguage : 'en';
+  });
+
+  // Change language handler
+  const changeLanguage = (lng: Language) => {
+    i18n.changeLanguage(lng);
+    setLanguage(lng);
+    localStorage.setItem('language', lng);
+  };
+
+  // Initialize i18n with the current language
   useEffect(() => {
-    // Initialize from localStorage or browser preference
-    const savedLang = localStorage.getItem('language') as Language;
-    if (savedLang && Object.keys(languages).includes(savedLang)) {
-      setLanguage(savedLang);
-      i18n.changeLanguage(savedLang);
-    } else {
-      setLanguage('en');
-      i18n.changeLanguage('en');
+    if (i18n.language !== language) {
+      i18n.changeLanguage(language);
     }
-  }, [i18n]);
-
-  const changeLanguage = (lang: Language) => {
-    i18n.changeLanguage(lang);
-    setLanguage(lang);
-    localStorage.setItem('language', lang);
-  };
-
-  const contextValue: LanguageContextType = {
-    language,
-    changeLanguage,
-    isRTL
-  };
+  }, [language]);
 
   return (
-    <LanguageContext.Provider value={contextValue}>
+    <LanguageContext.Provider value={{ language, changeLanguage }}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
+// Create and export the hook
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) {

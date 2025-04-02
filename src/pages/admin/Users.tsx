@@ -41,7 +41,7 @@ const Users = () => {
           </div>
         </div>
 
-        <UsersTable searchQuery={searchQuery} />
+        <UsersTable />
       </div>
       <Toaster />
     </AdminLayout>

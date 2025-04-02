@@ -125,7 +125,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex flex-col flex-1 overflow-x-hidden">
           <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
             <div className="md:hidden">
-              <SidebarTrigger />
+              <SidebarTrigger className="text-white bg-primary hover:bg-primary/90" />
             </div>
             <div className="flex-1">
               <h1 className="font-semibold text-lg">Desert Tours Admin</h1>

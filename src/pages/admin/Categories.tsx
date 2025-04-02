@@ -26,7 +26,7 @@ const Categories = () => {
           />
         </div>
 
-        <CategoriesTable searchQuery={searchQuery} />
+        <CategoriesTable />
       </div>
       <Toaster />
     </AdminLayout>

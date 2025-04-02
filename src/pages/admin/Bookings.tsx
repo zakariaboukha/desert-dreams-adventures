@@ -41,7 +41,7 @@ const Bookings = () => {
           </div>
         </div>
 
-        <BookingsTable searchQuery={searchQuery} />
+        <BookingsTable />
       </div>
       <Toaster />
     </AdminLayout>
