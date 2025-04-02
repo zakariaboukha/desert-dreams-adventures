@@ -43,8 +43,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
   
-  // Define navigation items outside of render function to avoid excessive type instantiation
-  const navigation = [
+  // Fix excessive type instantiation by using a static array
+  const navigationItems = [
     { name: t('admin.dashboard'), href: '/admin/dashboard', icon: LayoutDashboard },
     { name: t('admin.excursions'), href: '/admin/excursions', icon: Map },
     { name: t('admin.categories'), href: '/admin/categories', icon: Tag },
@@ -60,8 +60,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
-        <Sidebar className="border-r">
-          <SidebarHeader className="flex items-center justify-between p-4 border-b">
+        <Sidebar className="border-r bg-background">
+          <SidebarHeader className="flex items-center justify-between p-4 border-b bg-background">
             <Link to="/admin/dashboard" className="flex items-center space-x-2">
               <Map className="h-6 w-6 text-primary" />
               <span className="font-bold text-xl">{t('admin.dashboard')}</span>
@@ -69,11 +69,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <SidebarTrigger />
           </SidebarHeader>
           
-          <SidebarContent className="p-2">
+          <SidebarContent className="p-2 bg-background">
             <SidebarGroup>
               <SidebarGroupLabel>{t('admin.navigation')}</SidebarGroupLabel>
               <SidebarMenu>
-                {navigation.map((item) => (
+                {navigationItems.map((item) => (
                   <SidebarMenuItem key={item.name}>
                     <SidebarMenuButton 
                       asChild 
@@ -91,7 +91,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </SidebarGroup>
           </SidebarContent>
           
-          <SidebarFooter className="mt-auto p-4 border-t">
+          <SidebarFooter className="mt-auto p-4 border-t bg-background">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <Avatar className="h-9 w-9">
