@@ -28,7 +28,8 @@ import {
   SidebarMenuButton,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarRail
+  SidebarRail,
+  useSidebar  // Fixed: Properly import the useSidebar hook
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -178,4 +179,3 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     </SidebarProvider>
   );
 }
-
