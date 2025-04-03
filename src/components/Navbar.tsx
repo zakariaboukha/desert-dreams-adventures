@@ -39,13 +39,13 @@ const Navbar: React.FC = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Define with explicit type annotation to avoid deep instantiation
-  const navLinks: Array<NavLink> = [
+  // Define with a simple constant array and type it with 'as const' to avoid excess type depth
+  const navLinks = [
     { to: "/", text: t('navbar.home') },
     { to: "/destinations", text: t('navbar.destinations') },
     { to: "/about", text: t('navbar.about') },
     { to: "/contact", text: t('navbar.contact') },
-  ];
+  ] as const;
 
   return (
     <nav className={navClasses}>
