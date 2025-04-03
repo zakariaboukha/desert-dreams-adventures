@@ -14,6 +14,7 @@ import {
   Sun,
   Globe,
   PanelLeft,
+  LucideIcon
 } from "lucide-react";
 import { 
   Sidebar, 
@@ -43,7 +44,7 @@ interface AdminLayoutProps {
 interface NavItem {
   name: string;
   href: string;
-  icon: React.FC<{ className?: string }>;
+  icon: LucideIcon;
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
@@ -52,16 +53,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
   
-  // Fix: We're removing the useSidebar hook since it will be used only inside the sidebar components
-  
-  // Fix: Use explicit type annotation to avoid excessive type inference
-  const navigationItems: NavItem[] = [
-    { name: t('admin.dashboard'), href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: t('admin.excursions'), href: '/admin/excursions', icon: Map },
-    { name: t('admin.categories'), href: '/admin/categories', icon: Tag },
-    { name: t('admin.users'), href: '/admin/users', icon: Users },
-    { name: t('admin.bookings'), href: '/admin/bookings', icon: Calendar },
-    { name: t('admin.settings'), href: '/admin/settings', icon: Settings },
+  // Define navigation items with explicit typing to avoid recursive type references
+  const navigationItems: Array<NavItem> = [
+    { name: String(t('admin.dashboard')), href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: String(t('admin.excursions')), href: '/admin/excursions', icon: Map },
+    { name: String(t('admin.categories')), href: '/admin/categories', icon: Tag },
+    { name: String(t('admin.users')), href: '/admin/users', icon: Users },
+    { name: String(t('admin.bookings')), href: '/admin/bookings', icon: Calendar },
+    { name: String(t('admin.settings')), href: '/admin/settings', icon: Settings },
   ];
 
   const isActive = (path: string) => {
@@ -84,7 +83,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <SidebarGroupLabel>{t('admin.navigation')}</SidebarGroupLabel>
             <SidebarMenu>
               {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.name}>
+                <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton 
                     asChild 
                     isActive={isActive(item.href)}
@@ -127,7 +126,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           
           <Button variant="outline" className="w-full flex items-center justify-center gap-2 bg-background">
             <LogOut className="h-4 w-4" />
-            <span>{t('admin.sign_out')}</span>
+            <span>{String(t('admin.sign_out'))}</span>
           </Button>
         </SidebarFooter>
         
@@ -165,7 +164,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </DropdownMenu>
             
             <Button variant="outline" asChild className="bg-background">
-              <Link to="/" target="_blank">{t('admin.view_site')}</Link>
+              <Link to="/" target="_blank">{String(t('admin.view_site'))}</Link>
             </Button>
           </div>
         </header>
