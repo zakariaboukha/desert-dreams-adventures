@@ -1,51 +1,50 @@
-
 {
   "common": {
-    "book_now": "Reservar Ahora",
+    "book_now": "Reservar ahora",
     "contact_us": "Contáctenos",
-    "explore_destinations": "Explorar Destinos"
+    "explore_destinations": "Explorar destinos"
   },
   "navbar": {
     "home": "Inicio",
     "destinations": "Destinos",
-    "about": "Sobre Nosotros",
+    "about": "Acerca de",
     "contact": "Contacto"
   },
   "hero": {
-    "title": "Descubre la Magia del Desierto",
-    "description": "Experiencias inolvidables a través de dunas doradas y paisajes impresionantes. Nuestras excursiones en 4x4 te traen lo mejor de la belleza del Sahara."
+    "title": "Descubre la magia del desierto",
+    "description": "Experimenta aventuras inolvidables a través de dunas doradas y paisajes impresionantes. Nuestras excursiones en 4x4 te traen lo mejor de la belleza del Sahara."
   },
   "featured": {
-    "title": "Aventuras Destacadas",
-    "subtitle": "Descubre nuestras experiencias más populares en el desierto",
-    "view_all": "Ver Todos los Destinos"
+    "title": "Aventuras destacadas",
+    "subtitle": "Descubre nuestras experiencias desérticas más populares",
+    "view_all": "Ver todos los destinos"
   },
   "explore": {
-    "title": "Explora el Desierto",
-    "subtitle": "Paisajes impresionantes y potentes aventuras en 4x4 te esperan"
+    "title": "Explora el desierto",
+    "subtitle": "Te esperan paisajes impresionantes y potentes aventuras en 4x4"
   },
   "stats": {
-    "tours": "Tours del Desierto",
-    "adventurers": "Aventureros Felices",
-    "experience": "Años de Experiencia",
-    "guides": "Guías Expertos"
+    "tours": "Tours del desierto",
+    "adventurers": "Aventureros felices",
+    "experience": "Años de experiencia",
+    "guides": "Guías expertos"
   },
   "cta": {
-    "title": "¿Listo para tu Aventura en el Desierto?",
-    "description": "Reserva tu expedición de ensueño hoy y experimenta la magia del desierto con nuestros guías expertos.",
-    "plan_trip": "Planifica tu Viaje"
+    "title": "¿Listo para tu aventura en el desierto?",
+    "description": "Reserva tu expedición soñada hoy y experimenta la magia del desierto con nuestros guías expertos.",
+    "plan_trip": "Planifica tu viaje"
   },
   "footer": {
-    "description": "Descubre la magia de las aventuras en el desierto con nuestros tours y excursiones premium.",
-    "quick_links": "Enlaces Rápidos",
-    "popular_tours": "Tours Populares",
-    "contact_us": "Contáctanos"
+    "description": "Descubre la magia de las aventuras desérticas con nuestros tours y excursiones premium.",
+    "quick_links": "Enlaces rápidos",
+    "popular_tours": "Tours populares",
+    "contact_us": "Contáctenos"
   },
   "contact": {
-    "get_in_touch": "Ponte en Contacto",
-    "our_location": "Nuestra Ubicación",
-    "email_us": "Envíanos un Email",
+    "get_in_touch": "Ponte en contacto",
+    "our_location": "Nuestra ubicación",
+    "email_us": "Envíanos un correo",
     "call_us": "Llámanos",
-    "office_hours": "Horario de Oficina"
+    "office_hours": "Horario de oficina"
   }
 }

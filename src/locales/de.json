@@ -1,14 +1,13 @@
-
 {
   "common": {
-    "book_now": "Jetzt Buchen",
-    "contact_us": "Kontaktieren Sie Uns",
-    "explore_destinations": "Entdecken Sie Ziele"
+    "book_now": "Jetzt buchen",
+    "contact_us": "Kontaktieren Sie uns",
+    "explore_destinations": "Ziele erkunden"
   },
   "navbar": {
     "home": "Startseite",
     "destinations": "Reiseziele",
-    "about": "Über Uns",
+    "about": "Über uns",
     "contact": "Kontakt"
   },
   "hero": {
@@ -16,9 +15,9 @@
     "description": "Erleben Sie unvergessliche Abenteuer durch goldene Dünen und atemberaubende Landschaften. Unsere 4x4-Exkursionen bringen Ihnen das Beste der Schönheit der Sahara."
   },
   "featured": {
-    "title": "Empfohlene Abenteuer",
+    "title": "Ausgewählte Abenteuer",
     "subtitle": "Entdecken Sie unsere beliebtesten Wüstenerlebnisse",
-    "view_all": "Alle Reiseziele Anzeigen"
+    "view_all": "Alle Reiseziele anzeigen"
   },
   "explore": {
     "title": "Erkunden Sie die Wüste",
@@ -28,24 +27,24 @@
     "tours": "Wüstentouren",
     "adventurers": "Glückliche Abenteurer",
     "experience": "Jahre Erfahrung",
-    "guides": "Erfahrene Guides"
+    "guides": "Experten-Guides"
   },
   "cta": {
     "title": "Bereit für Ihr Wüstenabenteuer?",
-    "description": "Buchen Sie Ihre Traumexpedition noch heute und erleben Sie die Magie der Wüste mit unseren erfahrenen Guides.",
+    "description": "Buchen Sie Ihre Traumexpedition noch heute und erleben Sie die Magie der Wüste mit unseren Expertenführern.",
     "plan_trip": "Planen Sie Ihre Reise"
   },
   "footer": {
-    "description": "Entdecken Sie den Zauber von Wüstenabenteuern mit unseren Premium-Touren und Ausflügen.",
-    "quick_links": "Schnellzugriff",
+    "description": "Entdecken Sie die Magie der Wüstenabenteuer mit unseren Premium-Touren und Exkursionen.",
+    "quick_links": "Schnelllinks",
     "popular_tours": "Beliebte Touren",
-    "contact_us": "Kontaktieren Sie Uns"
+    "contact_us": "Kontaktieren Sie uns"
   },
   "contact": {
-    "get_in_touch": "Kontaktieren Sie Uns",
+    "get_in_touch": "Kontaktieren Sie uns",
     "our_location": "Unser Standort",
-    "email_us": "Schreiben Sie Uns",
-    "call_us": "Rufen Sie Uns An",
-    "office_hours": "Geschäftszeiten"
+    "email_us": "E-Mail an uns",
+    "call_us": "Rufen Sie uns an",
+    "office_hours": "Bürozeiten"
   }
 }

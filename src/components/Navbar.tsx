@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
@@ -39,12 +38,12 @@ const Navbar = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Define navLinks with explicit type annotation
-  const navLinks: Array<NavLink> = [
-    { to: "/", text: String(t('navbar.home')) },
-    { to: "/destinations", text: String(t('navbar.destinations')) },
-    { to: "/about", text: String(t('navbar.about')) },
-    { to: "/contact", text: String(t('navbar.contact')) },
+  // Define navLinks with explicit type annotation and avoid using String() on translations
+  const navLinks: NavLink[] = [
+    { to: "/", text: t('navbar.home') as string },
+    { to: "/destinations", text: t('navbar.destinations') as string },
+    { to: "/about", text: t('navbar.about') as string },
+    { to: "/contact", text: t('navbar.contact') as string },
   ];
 
   return (
@@ -72,7 +71,7 @@ const Navbar = () => {
             {getThemeIcon()}
           </button>
           <Link to="/booking" className="btn-primary">
-            {String(t('common.book_now'))}
+            {t('common.book_now') as string}
           </Link>
         </div>
 
@@ -111,7 +110,7 @@ const Navbar = () => {
                 className="btn-primary mx-4"
                 onClick={() => setIsMenuOpen(false)}
               >
-                {String(t('common.book_now'))}
+                {t('common.book_now') as string}
               </Link>
             </div>
           </div>
