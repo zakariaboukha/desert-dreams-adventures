@@ -6,7 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
-// Define explicit interface to avoid deep instantiation
+// Define explicit interface for navigation links
 interface NavLink {
   to: string;
   text: string;
@@ -39,13 +39,13 @@ const Navbar: React.FC = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Define with a simple constant array and type it with 'as const' to avoid excess type depth
-  const navLinks = [
+  // Define navLinks with explicit type to avoid deep instantiation
+  const navLinks: NavLink[] = [
     { to: "/", text: t('navbar.home') },
     { to: "/destinations", text: t('navbar.destinations') },
     { to: "/about", text: t('navbar.about') },
     { to: "/contact", text: t('navbar.contact') },
-  ] as const;
+  ];
 
   return (
     <nav className={navClasses}>
