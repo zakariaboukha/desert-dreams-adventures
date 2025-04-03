@@ -41,10 +41,10 @@ const Navbar = () => {
 
   // Define navLinks with explicit string literals to avoid deep type instantiation
   const navLinks: Array<NavLink> = [
-    { to: "/", text: t('navbar.home') as string },
-    { to: "/destinations", text: t('navbar.destinations') as string },
-    { to: "/about", text: t('navbar.about') as string },
-    { to: "/contact", text: t('navbar.contact') as string },
+    { to: "/", text: String(t('navbar.home')) },
+    { to: "/destinations", text: String(t('navbar.destinations')) },
+    { to: "/about", text: String(t('navbar.about')) },
+    { to: "/contact", text: String(t('navbar.contact')) },
   ];
 
   return (
@@ -72,7 +72,7 @@ const Navbar = () => {
             {getThemeIcon()}
           </button>
           <Link to="/booking" className="btn-primary">
-            {t('common.book_now')}
+            {String(t('common.book_now'))}
           </Link>
         </div>
 
@@ -111,7 +111,7 @@ const Navbar = () => {
                 className="btn-primary mx-4"
                 onClick={() => setIsMenuOpen(false)}
               >
-                {t('common.book_now')}
+                {String(t('common.book_now'))}
               </Link>
             </div>
           </div>
