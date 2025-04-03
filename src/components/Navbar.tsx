@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
@@ -5,6 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
+// Define explicit interface to avoid deep instantiation
 interface NavLink {
   to: string;
   text: string;
@@ -37,7 +39,8 @@ const Navbar: React.FC = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  const navLinks: NavLink[] = [
+  // Define with explicit type annotation to avoid deep instantiation
+  const navLinks: Array<NavLink> = [
     { to: "/", text: t('navbar.home') },
     { to: "/destinations", text: t('navbar.destinations') },
     { to: "/about", text: t('navbar.about') },
