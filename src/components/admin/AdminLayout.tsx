@@ -13,8 +13,7 @@ import {
   Moon,
   Sun,
   Globe,
-  PanelLeft,
-  type Icon as LucideIcon
+  PanelLeft
 } from "lucide-react";
 import { 
   Sidebar, 
@@ -40,11 +39,11 @@ interface AdminLayoutProps {
 }
 
 // Define navigation item interface with proper typing
-interface NavItem {
+type NavItem = {
   name: string;
   href: string;
-  icon: LucideIcon;
-}
+  icon: React.ComponentType<{ className?: string }>;
+};
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
@@ -52,8 +51,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
   
-  // Define navigation items with simpler typing approach
-  const navigationItems = [
+  // Define navigation items with proper typing
+  const navigationItems: NavItem[] = [
     { name: String(t('admin.dashboard')), href: '/admin/dashboard', icon: LayoutDashboard },
     { name: String(t('admin.excursions')), href: '/admin/excursions', icon: Map },
     { name: String(t('admin.categories')), href: '/admin/categories', icon: Tag },

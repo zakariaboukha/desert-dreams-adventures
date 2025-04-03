@@ -20,6 +20,7 @@ import {
   Legend 
 } from 'recharts';
 
+// Dashboard component with optimized structure
 const Dashboard = () => {
   const { t } = useTranslation();
   
