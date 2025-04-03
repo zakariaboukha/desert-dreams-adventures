@@ -34,6 +34,14 @@ const Navbar: React.FC = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
+  // Create static arrays for links to avoid excessive type instantiation 
+  const navLinks = [
+    { to: "/", text: t('navbar.home') },
+    { to: "/destinations", text: t('navbar.destinations') },
+    { to: "/about", text: t('navbar.about') },
+    { to: "/contact", text: t('navbar.contact') },
+  ];
+
   return (
     <nav className={navClasses}>
       <div className="container-custom flex justify-between items-center">
@@ -46,18 +54,11 @@ const Navbar: React.FC = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-foreground hover:text-primary transition-all">
-            {t('navbar.home')}
-          </Link>
-          <Link to="/destinations" className="text-foreground hover:text-primary transition-all">
-            {t('navbar.destinations')}
-          </Link>
-          <Link to="/about" className="text-foreground hover:text-primary transition-all">
-            {t('navbar.about')}
-          </Link>
-          <Link to="/contact" className="text-foreground hover:text-primary transition-all">
-            {t('navbar.contact')}
-          </Link>
+          {navLinks.map(link => (
+            <Link key={link.to} to={link.to} className="text-foreground hover:text-primary transition-all">
+              {link.text}
+            </Link>
+          ))}
           <LanguageSwitcher />
           <button
             onClick={toggleTheme}
@@ -94,34 +95,16 @@ const Navbar: React.FC = () => {
         {isMenuOpen && (
           <div className="absolute top-full left-0 right-0 glass py-4 md:hidden animate-fade-in">
             <div className="container-custom flex flex-col space-y-4">
-              <Link
-                to="/"
-                className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('navbar.home')}
-              </Link>
-              <Link
-                to="/destinations"
-                className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('navbar.destinations')}
-              </Link>
-              <Link
-                to="/about"
-                className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('navbar.about')}
-              </Link>
-              <Link
-                to="/contact"
-                className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('navbar.contact')}
-              </Link>
+              {navLinks.map(link => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="text-foreground hover:text-primary px-4 py-2 hover:bg-secondary/50 rounded-md transition-all"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.text}
+                </Link>
+              ))}
               <Link
                 to="/booking"
                 className="btn-primary mx-4"

@@ -12,7 +12,9 @@ import {
   LogOut, 
   Moon,
   Sun,
-  Globe
+  Globe,
+  PanelLeft,
+  PanelRight
 } from "lucide-react";
 import { 
   SidebarProvider, 
@@ -25,7 +27,8 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarGroup,
-  SidebarGroupLabel
+  SidebarGroupLabel,
+  SidebarRail
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -42,8 +45,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { theme, setTheme } = useTheme();
   const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
+  const { state } = useSidebar();
   
-  // Fix excessive type instantiation by using a static array
+  // Create a static array instead of using the t function directly in the array definition
   const navigationItems = [
     { name: t('admin.dashboard'), href: '/admin/dashboard', icon: LayoutDashboard },
     { name: t('admin.excursions'), href: '/admin/excursions', icon: Map },
@@ -120,6 +124,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <span>{t('admin.sign_out')}</span>
             </Button>
           </SidebarFooter>
+          
+          {/* Add SidebarRail to show a clickable area when sidebar is collapsed */}
+          <SidebarRail />
         </Sidebar>
         
         <div className="flex flex-col flex-1 overflow-x-hidden">
@@ -171,3 +178,4 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     </SidebarProvider>
   );
 }
+
