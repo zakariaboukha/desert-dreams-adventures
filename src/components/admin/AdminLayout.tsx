@@ -14,7 +14,7 @@ import {
   Sun,
   Globe,
   PanelLeft,
-  LucideIcon
+  type Icon as LucideIcon
 } from "lucide-react";
 import { 
   Sidebar, 
@@ -39,7 +39,7 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-// Define navigation item interface to prevent type inference issues
+// Define navigation item interface with proper typing
 interface NavItem {
   name: string;
   href: string;
@@ -52,8 +52,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
   
-  // Define navigation items with explicit typing to avoid recursive type references
-  const navigationItems: Array<NavItem> = [
+  // Define navigation items with simpler typing approach
+  const navigationItems = [
     { name: String(t('admin.dashboard')), href: '/admin/dashboard', icon: LayoutDashboard },
     { name: String(t('admin.excursions')), href: '/admin/excursions', icon: Map },
     { name: String(t('admin.categories')), href: '/admin/categories', icon: Tag },

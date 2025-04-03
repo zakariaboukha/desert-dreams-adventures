@@ -39,14 +39,13 @@ const Navbar = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Use explicit type with Array<NavLink> instead of NavLink[]
-  // And use String() to ensure translation returns a string
-  const navLinks: Array<NavLink> = [
+  // Define navLinks array with explicit type annotation and string conversion
+  const navLinks = [
     { to: "/", text: String(t('navbar.home')) },
     { to: "/destinations", text: String(t('navbar.destinations')) },
     { to: "/about", text: String(t('navbar.about')) },
     { to: "/contact", text: String(t('navbar.contact')) },
-  ];
+  ] as const;
 
   return (
     <nav className={navClasses}>
