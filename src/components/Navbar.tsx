@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
@@ -6,13 +5,17 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
+interface NavLink {
+  to: string;
+  text: string;
+}
+
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { t } = useTranslation();
 
-  // Handle scroll event to change navbar appearance
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -26,7 +29,6 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fix: Use explicit type for icon instead of relying on inference
   const getThemeIcon = () => {
     return theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
   };
@@ -35,25 +37,22 @@ const Navbar: React.FC = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Fix: Use explicit type for navLinks to avoid excessive type inference
-  const navLinks = [
+  const navLinks: NavLink[] = [
     { to: "/", text: t('navbar.home') },
     { to: "/destinations", text: t('navbar.destinations') },
     { to: "/about", text: t('navbar.about') },
     { to: "/contact", text: t('navbar.contact') },
-  ] as const;
+  ];
 
   return (
     <nav className={navClasses}>
       <div className="container-custom flex justify-between items-center">
-        {/* Logo */}
         <Link to="/" className="flex items-center">
           <h1 className="text-2xl font-bold text-foreground">
             <span className="text-primary">Desert</span>Dreams
           </h1>
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
           {navLinks.map(link => (
             <Link key={link.to} to={link.to} className="text-foreground hover:text-primary transition-all">
@@ -74,7 +73,6 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
 
-        {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden">
           <LanguageSwitcher />
           <button
@@ -92,7 +90,6 @@ const Navbar: React.FC = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="absolute top-full left-0 right-0 glass py-4 md:hidden animate-fade-in">
             <div className="container-custom flex flex-col space-y-4">

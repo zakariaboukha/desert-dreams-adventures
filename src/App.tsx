@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import Index from "./pages/Index";
 import Destinations from "./pages/Destinations";
 import DestinationDetail from "./pages/DestinationDetail";
@@ -24,6 +25,20 @@ import AdminBookings from "./pages/admin/Bookings";
 import AdminSettings from "./pages/admin/Settings";
 
 const queryClient = new QueryClient();
+
+// Admin Routes component with SidebarProvider
+const AdminRoutes = () => (
+  <SidebarProvider>
+    <Routes>
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/excursions" element={<AdminExcursions />} />
+      <Route path="/admin/categories" element={<AdminCategories />} />
+      <Route path="/admin/users" element={<AdminUsers />} />
+      <Route path="/admin/bookings" element={<AdminBookings />} />
+      <Route path="/admin/settings" element={<AdminSettings />} />
+    </Routes>
+  </SidebarProvider>
+);
 
 const App = () => (
   <React.StrictMode>
@@ -43,13 +58,8 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/booking" element={<Booking />} />
                 
-                {/* Admin Routes */}
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/excursions" element={<AdminExcursions />} />
-                <Route path="/admin/categories" element={<AdminCategories />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/bookings" element={<AdminBookings />} />
-                <Route path="/admin/settings" element={<AdminSettings />} />
+                {/* Admin Routes - Wrapped with SidebarProvider */}
+                <Route path="/admin/*" element={<AdminRoutes />} />
                 
                 {/* 404 Route */}
                 <Route path="*" element={<NotFound />} />
