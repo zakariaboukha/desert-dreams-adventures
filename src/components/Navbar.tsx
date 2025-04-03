@@ -39,7 +39,8 @@ const Navbar = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Define navLinks with explicit string literals to avoid deep type instantiation
+  // Use explicit type with Array<NavLink> instead of NavLink[]
+  // And use String() to ensure translation returns a string
   const navLinks: Array<NavLink> = [
     { to: "/", text: String(t('navbar.home')) },
     { to: "/destinations", text: String(t('navbar.destinations')) },

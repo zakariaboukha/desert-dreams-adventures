@@ -27,8 +27,7 @@ import {
   SidebarMenuButton,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarRail,
-  useSidebar
+  SidebarRail
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -73,14 +72,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <SidebarHeader className="flex items-center justify-between p-4 border-b bg-background">
           <Link to="/admin/dashboard" className="flex items-center space-x-2">
             <Map className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">{t('admin.dashboard')}</span>
+            <span className="font-bold text-xl">{String(t('admin.dashboard'))}</span>
           </Link>
           <SidebarTrigger />
         </SidebarHeader>
         
         <SidebarContent className="p-2 bg-background">
           <SidebarGroup>
-            <SidebarGroupLabel>{t('admin.navigation')}</SidebarGroupLabel>
+            <SidebarGroupLabel>{String(t('admin.navigation'))}</SidebarGroupLabel>
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
