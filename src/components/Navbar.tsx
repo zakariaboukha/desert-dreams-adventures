@@ -12,7 +12,7 @@ interface NavLink {
   text: string;
 }
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
@@ -39,12 +39,12 @@ const Navbar: React.FC = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Define navLinks with explicit type to avoid deep instantiation
-  const navLinks: NavLink[] = [
-    { to: "/", text: t('navbar.home') },
-    { to: "/destinations", text: t('navbar.destinations') },
-    { to: "/about", text: t('navbar.about') },
-    { to: "/contact", text: t('navbar.contact') },
+  // Define navLinks with explicit string literals to avoid deep type instantiation
+  const navLinks: Array<NavLink> = [
+    { to: "/", text: t('navbar.home') as string },
+    { to: "/destinations", text: t('navbar.destinations') as string },
+    { to: "/about", text: t('navbar.about') as string },
+    { to: "/contact", text: t('navbar.contact') as string },
   ];
 
   return (
