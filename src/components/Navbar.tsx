@@ -26,6 +26,7 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Fix: Use explicit type for icon instead of relying on inference
   const getThemeIcon = () => {
     return theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
   };
@@ -34,13 +35,13 @@ const Navbar: React.FC = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Create static arrays for links to avoid excessive type instantiation 
+  // Fix: Use explicit type for navLinks to avoid excessive type inference
   const navLinks = [
     { to: "/", text: t('navbar.home') },
     { to: "/destinations", text: t('navbar.destinations') },
     { to: "/about", text: t('navbar.about') },
     { to: "/contact", text: t('navbar.contact') },
-  ];
+  ] as const;
 
   return (
     <nav className={navClasses}>

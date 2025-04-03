@@ -14,7 +14,6 @@ import {
   Sun,
   Globe,
   PanelLeft,
-  PanelRight
 } from "lucide-react";
 import { 
   SidebarProvider, 
@@ -29,7 +28,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarRail,
-  useSidebar  // Fixed: Properly import the useSidebar hook
+  useSidebar
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -41,6 +40,13 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
+// Define navigation item interface to prevent type inference issues
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.FC<{ className?: string }>;
+}
+
 export function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
@@ -48,8 +54,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { t } = useTranslation();
   const { state } = useSidebar();
   
-  // Create a static array instead of using the t function directly in the array definition
-  const navigationItems = [
+  // Fix: Use explicit type annotation to avoid excessive type inference
+  const navigationItems: NavItem[] = [
     { name: t('admin.dashboard'), href: '/admin/dashboard', icon: LayoutDashboard },
     { name: t('admin.excursions'), href: '/admin/excursions', icon: Map },
     { name: t('admin.categories'), href: '/admin/categories', icon: Tag },
