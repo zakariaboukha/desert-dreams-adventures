@@ -1,3 +1,4 @@
+
 {
   "common": {
     "book_now": "Jetzt buchen",
@@ -46,5 +47,31 @@
     "email_us": "E-Mail an uns",
     "call_us": "Rufen Sie uns an",
     "office_hours": "Bürozeiten"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "overview": "Übersicht",
+    "excursions": "Exkursionen",
+    "bookings": "Buchungen",
+    "users": "Benutzer",
+    "reports": "Berichte",
+    "settings": "Einstellungen",
+    "management": "Verwaltung",
+    "content": "Inhalt",
+    "messages": "Nachrichten",
+    "orders": "Bestellungen",
+    "quick_stats": "Schnellstatistiken",
+    "today": "Heute",
+    "this_month": "Diesen Monat",
+    "total_revenue": "Gesamtumsatz",
+    "active_users": "Aktive Benutzer",
+    "system": "System",
+    "all": "Alle",
+    "search": "Suchen",
+    "add_new": "Neu hinzufügen",
+    "actions": "Aktionen",
+    "export": "Exportieren",
+    "filter": "Filter",
+    "logout": "Ausloggen"
   }
 }

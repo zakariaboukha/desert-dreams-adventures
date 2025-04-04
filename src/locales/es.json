@@ -1,3 +1,4 @@
+
 {
   "common": {
     "book_now": "Reservar ahora",
@@ -46,5 +47,31 @@
     "email_us": "Envíanos un correo",
     "call_us": "Llámanos",
     "office_hours": "Horario de oficina"
+  },
+  "admin": {
+    "dashboard": "Panel de control",
+    "overview": "Visión general",
+    "excursions": "Excursiones",
+    "bookings": "Reservas",
+    "users": "Usuarios",
+    "reports": "Informes",
+    "settings": "Configuración",
+    "management": "Gestión",
+    "content": "Contenido",
+    "messages": "Mensajes",
+    "orders": "Pedidos",
+    "quick_stats": "Estadísticas rápidas",
+    "today": "Hoy",
+    "this_month": "Este mes",
+    "total_revenue": "Ingresos totales",
+    "active_users": "Usuarios activos",
+    "system": "Sistema",
+    "all": "Todos",
+    "search": "Buscar",
+    "add_new": "Añadir nuevo",
+    "actions": "Acciones",
+    "export": "Exportar",
+    "filter": "Filtrar",
+    "logout": "Cerrar sesión"
   }
 }

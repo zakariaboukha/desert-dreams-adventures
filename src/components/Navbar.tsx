@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
@@ -5,7 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
-// Define navigation link type with explicit interface
+// Define navigation link type with explicit type
 interface NavLink {
   to: string;
   text: string;
@@ -38,12 +39,12 @@ const Navbar = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Define navLinks with explicit type annotation and avoid using String() on translations
+  // Define navLinks with explicit type
   const navLinks: NavLink[] = [
-    { to: "/", text: t('navbar.home') as string },
-    { to: "/destinations", text: t('navbar.destinations') as string },
-    { to: "/about", text: t('navbar.about') as string },
-    { to: "/contact", text: t('navbar.contact') as string },
+    { to: "/", text: t('navbar.home') },
+    { to: "/destinations", text: t('navbar.destinations') },
+    { to: "/about", text: t('navbar.about') },
+    { to: "/contact", text: t('navbar.contact') },
   ];
 
   return (
@@ -71,7 +72,7 @@ const Navbar = () => {
             {getThemeIcon()}
           </button>
           <Link to="/booking" className="btn-primary">
-            {t('common.book_now') as string}
+            {t('common.book_now')}
           </Link>
         </div>
 
@@ -110,7 +111,7 @@ const Navbar = () => {
                 className="btn-primary mx-4"
                 onClick={() => setIsMenuOpen(false)}
               >
-                {t('common.book_now') as string}
+                {t('common.book_now')}
               </Link>
             </div>
           </div>

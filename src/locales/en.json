@@ -1,3 +1,4 @@
+
 {
   "common": {
     "book_now": "Book Now",
@@ -46,5 +47,31 @@
     "email_us": "Email Us",
     "call_us": "Call Us",
     "office_hours": "Office Hours"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "excursions": "Excursions",
+    "bookings": "Bookings",
+    "users": "Users",
+    "reports": "Reports",
+    "settings": "Settings",
+    "management": "Management",
+    "content": "Content",
+    "messages": "Messages",
+    "orders": "Orders",
+    "quick_stats": "Quick Stats",
+    "today": "Today",
+    "this_month": "This Month",
+    "total_revenue": "Total Revenue",
+    "active_users": "Active Users",
+    "system": "System",
+    "all": "All",
+    "search": "Search",
+    "add_new": "Add New",
+    "actions": "Actions",
+    "export": "Export",
+    "filter": "Filter",
+    "logout": "Logout"
   }
 }
