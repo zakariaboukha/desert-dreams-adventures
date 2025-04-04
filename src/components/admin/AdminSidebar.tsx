@@ -8,7 +8,6 @@ import {
   Users, 
   Settings, 
   ShoppingCart,
-  MessageSquare, 
   BarChart2, 
   FileText, 
   ChevronDown,
@@ -104,7 +103,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, toggle }) => {
             <div 
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md transition-all cursor-pointer hover:bg-secondary/50",
-                isActive('/admin/excursions') ? "bg-primary/10 text-primary" : "text-foreground",
+                (isActive('/admin/excursions') || isActive('/admin/excursions/create') || isActive('/admin/excursions/categories')) ? "bg-primary/10 text-primary" : "text-foreground",
                 !isOpen && "justify-center"
               )}
               onClick={() => isOpen && setExcursionsOpen(!excursionsOpen)}
@@ -163,14 +162,6 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, toggle }) => {
             isOpen={isOpen}
           />
           
-          <MenuItem 
-            icon={<MessageSquare size={20} />} 
-            label="Messages" 
-            path="/admin/messages" 
-            active={isActive('/admin/messages')} 
-            isOpen={isOpen}
-          />
-          
           <div>
             <div 
               className={cn(
@@ -193,18 +184,18 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isOpen, toggle }) => {
               <div className="mt-1 mb-1">
                 <SubmenuItem 
                   label="Sales Reports" 
-                  path="/admin/reports/sales" 
-                  active={isActive('/admin/reports/sales')}
+                  path="/admin/reports?type=sales" 
+                  active={location.pathname === '/admin/reports' && location.search.includes('type=sales')}
                 />
                 <SubmenuItem 
                   label="Customer Analytics" 
-                  path="/admin/reports/customers" 
-                  active={isActive('/admin/reports/customers')}
+                  path="/admin/reports?type=customers" 
+                  active={location.pathname === '/admin/reports' && location.search.includes('type=customers')}
                 />
                 <SubmenuItem 
                   label="Performance" 
-                  path="/admin/reports/performance" 
-                  active={isActive('/admin/reports/performance')}
+                  path="/admin/reports?type=performance" 
+                  active={location.pathname === '/admin/reports' && location.search.includes('type=performance')}
                 />
               </div>
             )}

@@ -101,7 +101,8 @@ const BookingsTab: React.FC = () => {
     }
   };
 
-  const getDayClassName = (day: Date) => {
+  // This function now returns a string instead of a function
+  const getDayClassName = (day: Date): string => {
     const hasBooking = bookingEvents.some(booking => 
       booking.date.getDate() === day.getDate() &&
       booking.date.getMonth() === day.getMonth() &&
@@ -164,8 +165,8 @@ const BookingsTab: React.FC = () => {
                 selected={date}
                 onSelect={setDate}
                 className="rounded-md border"
-                classNames={{
-                  day: getDayClassName,
+                modifiersClassNames={{
+                  day_has_booking: getDayClassName(new Date()),
                 }}
               />
             </CardContent>

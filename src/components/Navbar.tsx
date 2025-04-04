@@ -6,7 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
-// Define navigation link type with explicit type
+// Define navigation link type
 interface NavLink {
   to: string;
   text: string;
@@ -39,7 +39,7 @@ const Navbar = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Define navLinks with explicit type
+  // Define navLinks array
   const navLinks: NavLink[] = [
     { to: "/", text: t('navbar.home') },
     { to: "/destinations", text: t('navbar.destinations') },

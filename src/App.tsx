@@ -15,7 +15,18 @@ import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./layouts/AdminLayout";
+
+// Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
+import Excursions from "./pages/admin/Excursions";
+import ExcursionCreate from "./pages/admin/ExcursionCreate";
+import ExcursionCategories from "./pages/admin/ExcursionCategories";
+import Bookings from "./pages/admin/Bookings";
+import Users from "./pages/admin/Users";
+import Orders from "./pages/admin/Orders";
+import Reports from "./pages/admin/Reports";
+import Content from "./pages/admin/Content";
+import Settings from "./pages/admin/Settings";
 
 const queryClient = new QueryClient();
 
@@ -40,18 +51,15 @@ const App = () => (
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<Dashboard />} />
-                  <Route path="excursions" element={<div>Excursions Management</div>} />
-                  <Route path="excursions/create" element={<div>Create Excursion</div>} />
-                  <Route path="excursions/categories" element={<div>Excursion Categories</div>} />
-                  <Route path="bookings" element={<div>Bookings Management</div>} />
-                  <Route path="users" element={<div>User Management</div>} />
-                  <Route path="orders" element={<div>Orders Management</div>} />
-                  <Route path="messages" element={<div>Message Center</div>} />
-                  <Route path="reports/sales" element={<div>Sales Reports</div>} />
-                  <Route path="reports/customers" element={<div>Customer Analytics</div>} />
-                  <Route path="reports/performance" element={<div>Performance Reports</div>} />
-                  <Route path="content" element={<div>Content Management</div>} />
-                  <Route path="settings" element={<div>System Settings</div>} />
+                  <Route path="excursions" element={<Excursions />} />
+                  <Route path="excursions/create" element={<ExcursionCreate />} />
+                  <Route path="excursions/categories" element={<ExcursionCategories />} />
+                  <Route path="bookings" element={<Bookings />} />
+                  <Route path="users" element={<Users />} />
+                  <Route path="orders" element={<Orders />} />
+                  <Route path="reports" element={<Reports />} />
+                  <Route path="content" element={<Content />} />
+                  <Route path="settings" element={<Settings />} />
                 </Route>
                 
                 {/* 404 Route */}
