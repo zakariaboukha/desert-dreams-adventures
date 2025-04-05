@@ -1,18 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
-  Search, 
+  Eye, 
+  EyeOff,
   Plus, 
-  Filter,
   ArrowUp,
   ArrowDown,
-  Eye,
-  EyeOff,
   Download
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -21,25 +18,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from "sonner";
 import ExcursionActions from '@/components/admin/excursions/ExcursionActions';
+import ExcursionFilters from '@/components/admin/excursions/ExcursionFilters';
 
-// Import excursion data (same data from ExcursionsTab)
+// Import excursion data
 import { excursionData } from '@/components/admin/excursions/data';
 
 type SortField = 'name' | 'price' | 'category' | 'bookings';
@@ -47,15 +32,17 @@ type SortDirection = 'asc' | 'desc';
 
 const Excursions: React.FC = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
-  const [sortField, setSortField] = React.useState<SortField>('name');
-  const [sortDirection, setSortDirection] = React.useState<SortDirection>('asc');
-  const [categoryFilter, setCategoryFilter] = React.useState('all');
-  const [statusFilter, setStatusFilter] = React.useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [excursions, setExcursions] = useState(excursionData);
 
   // Filter categories from data
-  const categories = [...new Set(excursionData.map(excursion => excursion.category))];
+  const categories = [...new Set(excursions.map(excursion => excursion.category))];
   
   const handleSort = (field: SortField) => {
     if (field === sortField) {
@@ -70,9 +57,39 @@ const Excursions: React.FC = () => {
     if (field !== sortField) return null;
     return sortDirection === 'asc' ? <ArrowUp size={16} /> : <ArrowDown size={16} />;
   };
+
+  const updateExcursion = (id: string, data: Partial<typeof excursions[0]>) => {
+    // In a real app, this would be an API call to Supabase
+    const updatedExcursions = excursions.map(excursion => 
+      excursion.id === id ? { ...excursion, ...data } : excursion
+    );
+    setExcursions(updatedExcursions);
+  };
+
+  const duplicateExcursion = (id: string) => {
+    // In a real app, this would be an API call to Supabase
+    const excursionToDuplicate = excursions.find(e => e.id === id);
+    if (!excursionToDuplicate) return;
+    
+    const newExcursion = {
+      ...excursionToDuplicate,
+      id: (Math.max(...excursions.map(e => parseInt(e.id))) + 1).toString(),
+      name: `${excursionToDuplicate.name} (Copy)`,
+      created: new Date().toISOString().split('T')[0]
+    };
+    
+    setExcursions([...excursions, newExcursion]);
+  };
+
+  const deleteExcursion = (id: string) => {
+    // In a real app, this would be an API call to Supabase
+    const updatedExcursions = excursions.filter(e => e.id !== id);
+    setExcursions(updatedExcursions);
+    setSelectedRows(selectedRows.filter(rowId => rowId !== id));
+  };
   
   // Filter and sort excursions
-  const filteredExcursions = excursionData
+  const filteredExcursions = excursions
     .filter(excursion => 
       // Search filter
       (excursion.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -82,7 +99,9 @@ const Excursions: React.FC = () => {
       // Status filter
       (statusFilter === 'all' || 
        (statusFilter === 'active' && excursion.active) || 
-       (statusFilter === 'inactive' && !excursion.active))
+       (statusFilter === 'inactive' && !excursion.active)) &&
+      // Price filter
+      (excursion.price >= priceRange[0] && excursion.price <= priceRange[1])
     )
     .sort((a, b) => {
       if (sortField === 'name') {
@@ -121,6 +140,33 @@ const Excursions: React.FC = () => {
     }
   };
 
+  const handleBulkStatusUpdate = (active: boolean) => {
+    if (selectedRows.length === 0) return;
+    
+    // In a real app, this would be an API call to Supabase
+    const updatedExcursions = excursions.map(excursion => 
+      selectedRows.includes(excursion.id) ? { ...excursion, active } : excursion
+    );
+    
+    setExcursions(updatedExcursions);
+    toast.success(`${selectedRows.length} excursions ${active ? 'activated' : 'deactivated'}`);
+  };
+  
+  const handleBulkDelete = () => {
+    if (selectedRows.length === 0) return;
+    
+    // In a real app, this would be an API call to Supabase
+    const updatedExcursions = excursions.filter(excursion => !selectedRows.includes(excursion.id));
+    setExcursions(updatedExcursions);
+    setSelectedRows([]);
+    toast.success(`${selectedRows.length} excursions deleted`);
+  };
+
+  const handleExport = () => {
+    // In a real app, this would generate and download a file
+    toast.success("Export feature will be available soon");
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -130,9 +176,14 @@ const Excursions: React.FC = () => {
             Manage all your tour excursions in one place.
           </p>
         </div>
-        <Button onClick={() => navigate('/admin/excursions/create')}>
-          <Plus className="h-4 w-4 mr-1" /> Create Excursion
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate('/admin/excursions/categories')}>
+            Categories
+          </Button>
+          <Button onClick={() => navigate('/admin/excursions/create')}>
+            <Plus className="h-4 w-4 mr-1" /> Create Excursion
+          </Button>
+        </div>
       </div>
       
       <Card>
@@ -145,78 +196,49 @@ const Excursions: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             {/* Filters and Search */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex w-full sm:w-96 items-center rounded-md border border-input bg-background px-3 py-1">
-                <Search className="h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search excursions..."
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-1.5"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Category Filter */}
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-32 h-9">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>{category}</SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                
-                {/* Status Filter */}
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32 h-9">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-9">
-                      <Filter className="h-4 w-4 mr-1" /> More Filters
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>Price Range</DropdownMenuItem>
-                    <DropdownMenuItem>Date Added</DropdownMenuItem>
-                    <DropdownMenuItem>Popularity</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                <Button variant="outline" size="sm" className="h-9">
-                  <Download className="h-4 w-4 mr-1" /> Export
-                </Button>
-              </div>
-            </div>
+            <ExcursionFilters 
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              categoryFilter={categoryFilter}
+              setCategoryFilter={setCategoryFilter}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              categories={categories}
+            />
             
             {/* Bulk actions */}
             {selectedRows.length > 0 && (
               <div className="flex items-center gap-2 py-2 bg-muted/50 px-3 rounded-md">
                 <span className="text-sm font-medium">{selectedRows.length} selected</span>
                 <div className="flex-1"></div>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleBulkStatusUpdate(true)}
+                >
                   <Eye className="h-4 w-4 mr-1" /> Set Active
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleBulkStatusUpdate(false)}
+                >
                   <EyeOff className="h-4 w-4 mr-1" /> Set Inactive
                 </Button>
-                <Button variant="destructive" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleExport}
+                >
+                  <Download className="h-4 w-4 mr-1" /> Export Selected
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={handleBulkDelete}
+                >
                   Delete Selected
                 </Button>
               </div>
@@ -289,7 +311,12 @@ const Excursions: React.FC = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          <ExcursionActions excursion={excursion} />
+                          <ExcursionActions 
+                            excursion={excursion}
+                            onUpdate={updateExcursion}
+                            onDelete={deleteExcursion}
+                            onDuplicate={duplicateExcursion}
+                          />
                         </TableCell>
                       </TableRow>
                     ))

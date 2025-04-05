@@ -13,11 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -26,8 +21,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { CalendarDays, ChevronLeft, ChevronRight, FileDown, Filter, Search, UserPlus } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Filter, Search, UserPlus } from "lucide-react";
 import BookingDetails from '@/components/admin/bookings/BookingDetails';
+import BookingExport from '@/components/admin/bookings/BookingExport';
+import BookingCreateForm from '@/components/admin/bookings/BookingCreateForm';
 
 // Mock booking data
 const bookingEvents = [
@@ -93,14 +90,35 @@ const bookingEvents = [
   },
 ];
 
+const excursionTypes = [
+  'All Types',
+  'Desert Safari Adventure',
+  'Sunset Camel Ride',
+  'Oasis Exploration',
+  'Dune Bashing Experience',
+  'Traditional Bedouin Camp'
+];
+
+const customerTiers = [
+  'All Tiers',
+  'Standard',
+  'Silver',
+  'Gold',
+  'Platinum'
+];
+
 const Bookings: React.FC = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [statusFilter, setStatusFilter] = useState('all');
+  const [excursionFilter, setExcursionFilter] = useState('All Types');
+  const [customerTierFilter, setCustomerTierFilter] = useState('All Tiers');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBooking, setSelectedBooking] = useState<string | null>(null);
+  const [isNewBookingDialogOpen, setIsNewBookingDialogOpen] = useState(false);
   
   const filteredEvents = bookingEvents.filter(event => 
     (statusFilter === 'all' || event.status === statusFilter) &&
+    (excursionFilter === 'All Types' || event.excursion === excursionFilter) &&
     (searchQuery === '' || 
      event.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
      event.excursion.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -138,6 +156,10 @@ const Bookings: React.FC = () => {
     }
   };
 
+  const handleBookingCreated = () => {
+    setIsNewBookingDialogOpen(false);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -160,7 +182,7 @@ const Bookings: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
               <Button variant="outline" size="sm">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -184,6 +206,34 @@ const Bookings: React.FC = () => {
             </div>
           </div>
           
+          <div className="flex flex-wrap gap-2">
+            <Select value={excursionFilter} onValueChange={setExcursionFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Excursion Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {excursionTypes.map(type => (
+                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Select value={customerTierFilter} onValueChange={setCustomerTierFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Customer Tier" />
+              </SelectTrigger>
+              <SelectContent>
+                {customerTiers.map(tier => (
+                  <SelectItem key={tier} value={tier}>{tier}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button variant="outline" size="sm" className="ml-auto">
+              <Filter className="h-4 w-4 mr-1" /> More Filters
+            </Button>
+          </div>
+          
           {/* Calendar */}
           <Card>
             <CardContent className="pt-6">
@@ -203,9 +253,6 @@ const Bookings: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-medium">Today's Bookings</h2>
-              <Button variant="outline" size="sm">
-                <FileDown className="h-4 w-4 mr-1" /> Export
-              </Button>
             </div>
             
             {filteredEvents.length === 0 ? (
@@ -267,43 +314,28 @@ const Bookings: React.FC = () => {
               <CardContent className="pt-6 space-y-4">
                 <div className="text-lg font-medium">Booking Actions</div>
                 
-                <Dialog>
+                <Dialog open={isNewBookingDialogOpen} onOpenChange={setIsNewBookingDialogOpen}>
                   <DialogTrigger asChild>
                     <Button className="w-full">
                       <UserPlus className="mr-2 h-4 w-4" />
                       New Booking
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="sm:max-w-[600px]">
                     <DialogHeader>
                       <DialogTitle>Create New Booking</DialogTitle>
                       <DialogDescription>
-                        Create a new booking for a customer.
+                        Enter the details for a new booking.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 pt-4">
-                      <p className="text-center text-muted-foreground">
-                        Booking form coming soon...
-                      </p>
-                    </div>
+                    <BookingCreateForm 
+                      onSuccess={handleBookingCreated}
+                      onCancel={() => setIsNewBookingDialogOpen(false)}
+                    />
                   </DialogContent>
                 </Dialog>
                 
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full">
-                      <FileDown className="mr-2 h-4 w-4" />
-                      Export Bookings
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-52">
-                    <div className="grid gap-2">
-                      <Button variant="outline" size="sm">CSV Format</Button>
-                      <Button variant="outline" size="sm">PDF Format</Button>
-                      <Button variant="outline" size="sm">Excel Format</Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <BookingExport className="w-full" />
                 
                 <Button variant="outline" className="w-full">
                   <Filter className="mr-2 h-4 w-4" />
