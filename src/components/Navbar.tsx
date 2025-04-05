@@ -6,7 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
-// Define navigation link type
+// Define navigation link type with a simpler structure
 interface NavLink {
   to: string;
   text: string;

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, UploadCloud, Image, Layout, Type, Check, X } from 'lucide-react';
@@ -99,7 +98,6 @@ const Content: React.FC = () => {
           <TabsTrigger value="media">Media</TabsTrigger>
         </TabsList>
         
-        {/* Pages Tab */}
         <TabsContent value="pages" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -150,7 +148,6 @@ const Content: React.FC = () => {
           </Card>
         </TabsContent>
         
-        {/* Categories Tab */}
         <TabsContent value="categories" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -223,7 +220,6 @@ const Content: React.FC = () => {
           </Card>
         </TabsContent>
         
-        {/* Media Tab */}
         <TabsContent value="media" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -253,7 +249,7 @@ const Content: React.FC = () => {
                       onChange={handleFileChange}
                     />
                     <Label htmlFor="fileUpload" className="cursor-pointer">
-                      <Button as="span">
+                      <Button>
                         <UploadCloud className="h-4 w-4 mr-2" />
                         Select Files
                       </Button>
@@ -296,7 +292,6 @@ const Content: React.FC = () => {
         </TabsContent>
       </Tabs>
       
-      {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
