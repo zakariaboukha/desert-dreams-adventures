@@ -31,10 +31,8 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fix: Use a type-safe function to get the icon instead of a jsx expression
-  const getThemeIcon = () => {
-    return theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
-  };
+  // Simplified theme icon rendering - fixed to avoid complex type inference
+  const themeIcon = theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
@@ -70,7 +68,7 @@ const Navbar = () => {
             aria-label="Toggle theme"
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
-            {getThemeIcon()}
+            {themeIcon}
           </button>
           <Link to="/booking" className="btn-primary">
             {t('common.book_now')}
@@ -84,7 +82,7 @@ const Navbar = () => {
             className="p-2 mr-2 rounded-full hover:bg-secondary/50 transition-all"
             aria-label="Toggle theme"
           >
-            {getThemeIcon()}
+            {themeIcon}
           </button>
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
