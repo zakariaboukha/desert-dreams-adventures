@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Sun, Moon } from 'lucide-react';
@@ -30,6 +31,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Fix: Use a type-safe function to get the icon instead of a jsx expression
   const getThemeIcon = () => {
     return theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
   };
@@ -38,7 +40,7 @@ const Navbar = () => {
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'
   }`;
 
-  // Define navLinks array
+  // Define navLinks array using the NavLink interface
   const navLinks: NavLink[] = [
     { to: "/", text: t('navbar.home') },
     { to: "/destinations", text: t('navbar.destinations') },
