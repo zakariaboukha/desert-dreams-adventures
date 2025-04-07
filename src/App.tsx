@@ -30,47 +30,49 @@ import Settings from "./pages/admin/Settings";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <React.StrictMode>
-    <ThemeProvider>
-      <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/destinations" element={<Destinations />} />
-                <Route path="/destinations/:id" element={<DestinationDetail />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/booking" element={<Booking />} />
-                
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<Dashboard />} />
-                  <Route path="excursions" element={<Excursions />} />
-                  <Route path="excursions/create" element={<ExcursionCreate />} />
-                  <Route path="excursions/categories" element={<ExcursionCategories />} />
-                  <Route path="bookings" element={<Bookings />} />
-                  <Route path="users" element={<Users />} />
-                  <Route path="orders" element={<Orders />} />
-                  <Route path="reports" element={<Reports />} />
-                  <Route path="content" element={<Content />} />
-                  <Route path="settings" element={<Settings />} />
-                </Route>
-                
-                {/* 404 Route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </TooltipProvider>
-          </BrowserRouter>
-        </QueryClientProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  </React.StrictMode>
-);
+const App = () => {
+  return (
+    <React.StrictMode>
+      <ThemeProvider>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <BrowserRouter>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/destinations" element={<Destinations />} />
+                  <Route path="/destinations/:id" element={<DestinationDetail />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/booking" element={<Booking />} />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="excursions" element={<Excursions />} />
+                    <Route path="excursions/create" element={<ExcursionCreate />} />
+                    <Route path="excursions/categories" element={<ExcursionCategories />} />
+                    <Route path="bookings" element={<Bookings />} />
+                    <Route path="users" element={<Users />} />
+                    <Route path="orders" element={<Orders />} />
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="content" element={<Content />} />
+                    <Route path="settings" element={<Settings />} />
+                  </Route>
+                  
+                  {/* 404 Route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </TooltipProvider>
+            </BrowserRouter>
+          </QueryClientProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </React.StrictMode>
+  );
+};
 
 export default App;
