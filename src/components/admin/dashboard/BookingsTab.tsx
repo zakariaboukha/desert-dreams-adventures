@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -159,16 +158,18 @@ const BookingsTab: React.FC = () => {
           </div>
           
           <Card>
-            <CardContent className="pt-6">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md border"
-                modifiersClassNames={{
-                  day_has_booking: getDayClassName(new Date()),
-                }}
-              />
+            <CardContent className="p-0 sm:p-6">
+              <div className="w-full max-w-[100vw] overflow-x-auto">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  className="rounded-md border w-full"
+                  modifiersClassNames={{
+                    day_has_booking: getDayClassName(new Date()),
+                  }}
+                />
+              </div>
             </CardContent>
           </Card>
           
@@ -184,44 +185,50 @@ const BookingsTab: React.FC = () => {
             )}
           </div>
           
-          <div className="space-y-2">
-            {filteredEvents.map((event) => (
-              <Card key={event.id} className="overflow-hidden">
-                <div className={`flex items-center gap-2 p-4 border-l-4 ${
-                  event.status === 'confirmed' ? 'border-green-500' :
-                  event.status === 'pending' ? 'border-yellow-500' :
-                  'border-red-500'
-                }`}>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium">{event.excursion}</h4>
-                        <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                          <span>{event.customer}</span>
-                          <span>•</span>
-                          <span>{format(event.date, 'MMM dd, yyyy')}</span>
-                          <span>•</span>
-                          <span>{event.people} {event.people === 1 ? 'person' : 'people'}</span>
+          <div className="overflow-x-auto -mx-4 px-4 pb-2">
+            <div className="min-w-[360px] space-y-2">
+              {filteredEvents.map((event) => (
+                <Card key={event.id} className="overflow-hidden mb-2">
+                  <div className={`flex items-center gap-2 p-3 sm:p-4 border-l-4 relative ${
+                    event.status === 'confirmed' ? 'border-green-500' :
+                    event.status === 'pending' ? 'border-yellow-500' :
+                    'border-red-500'
+                  }`}>
+                    <div className="flex-1 min-w-0 pr-7">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-medium truncate pr-12 sm:pr-0">{event.excursion}</h4>
+                          <div className="flex flex-wrap items-center gap-1 text-muted-foreground text-xs sm:text-sm">
+                            <span className="truncate max-w-[120px]">{event.customer}</span>
+                            <span className="hidden xs:inline">•</span>
+                            <span>{format(event.date, 'MMM dd, yyyy')}</span>
+                            <span className="hidden xs:inline">•</span>
+                            <span>{event.people} {event.people === 1 ? 'person' : 'people'}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 absolute top-3 sm:static right-10">
+                          <div className="flex flex-col items-end">
+                            <Badge variant="outline" className={`text-[10px] xs:text-xs whitespace-nowrap px-1.5 sm:px-2 ${getStatusColor(event.status)}`}>
+                              {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
+                            </Badge>
+                            <span className="text-[10px] xs:text-xs font-medium mt-1 text-muted-foreground">
+                              ${event.totalAmount.toFixed(2)}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className={getStatusColor(event.status)}>
-                          {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
-                        </Badge>
-                        <Badge variant="secondary">${event.totalAmount.toFixed(2)}</Badge>
-                      </div>
                     </div>
+                    
+                    <input 
+                      type="checkbox" 
+                      className="h-4 w-4 shrink-0 rounded border-muted-foreground absolute right-3 top-1/2 -translate-y-1/2"
+                      checked={selectedBookings.includes(event.id)}
+                      onChange={() => toggleBookingSelection(event.id)}
+                    />
                   </div>
-                  
-                  <input 
-                    type="checkbox" 
-                    className="h-4 w-4 rounded border-muted-foreground"
-                    checked={selectedBookings.includes(event.id)}
-                    onChange={() => toggleBookingSelection(event.id)}
-                  />
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
         

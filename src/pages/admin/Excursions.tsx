@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Eye, 
@@ -169,18 +168,18 @@ const Excursions: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-col sm:flex-row gap-3 sm:gap-0">
         <div>
           <h1 className="text-2xl font-bold tracking-tight mb-1">Excursions</h1>
           <p className="text-muted-foreground">
             Manage all your tour excursions in one place.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate('/admin/excursions/categories')}>
+        <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => navigate('/admin/excursions/categories')} className="w-full xs:w-auto">
             Categories
           </Button>
-          <Button onClick={() => navigate('/admin/excursions/create')}>
+          <Button onClick={() => navigate('/admin/excursions/create')} className="w-full xs:w-auto">
             <Plus className="h-4 w-4 mr-1" /> Create Excursion
           </Button>
         </div>
