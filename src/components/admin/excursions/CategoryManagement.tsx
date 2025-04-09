@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +32,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Edit, Plus, Trash } from 'lucide-react';
+
+interface CategoryManagementProps {
+  showHeading?: boolean;
+  isAddDialogOpen?: boolean;
+  setIsAddDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 interface Category {
   id: string;
@@ -88,7 +93,11 @@ const initialCategories = [
   }
 ];
 
-const CategoryManagement: React.FC = () => {
+const CategoryManagement: React.FC<CategoryManagementProps> = ({ 
+  showHeading = true,
+  isAddDialogOpen: externalIsAddDialogOpen,
+  setIsAddDialogOpen: externalSetIsAddDialogOpen
+}) => {
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [newCategory, setNewCategory] = useState({
     name: '',
@@ -96,8 +105,12 @@ const CategoryManagement: React.FC = () => {
     description: ''
   });
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [internalIsAddDialogOpen, setInternalIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // Use external state if provided, otherwise use internal state
+  const dialogOpen = externalIsAddDialogOpen !== undefined ? externalIsAddDialogOpen : internalIsAddDialogOpen;
+  const setDialogOpen = externalSetIsAddDialogOpen || setInternalIsAddDialogOpen;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -131,7 +144,7 @@ const CategoryManagement: React.FC = () => {
 
     setCategories([...categories, newCategoryWithId]);
     setNewCategory({ name: '', slug: '', description: '' });
-    setIsAddDialogOpen(false);
+    setDialogOpen(false);
     toast.success("Category added successfully");
   };
 
@@ -151,68 +164,80 @@ const CategoryManagement: React.FC = () => {
     toast.success("Category deleted successfully");
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="flex flex-row items-center justify-between pb-2">
-        <div>
-          <h2 className="text-xl font-semibold">Categories</h2>
-          <p className="text-sm text-muted-foreground">
-            Organize your excursions with custom categories.
+  const renderAddDialog = () => (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Add Category</DialogTitle>
+        <DialogDescription>
+          Create a new category for your excursions.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-4 py-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Category Name</Label>
+          <Input 
+            id="name" 
+            placeholder="Enter category name" 
+            value={newCategory.name}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="slug">Slug</Label>
+          <Input 
+            id="slug" 
+            placeholder="Enter category slug" 
+            value={newCategory.slug}
+            onChange={handleInputChange}
+          />
+          <p className="text-xs text-muted-foreground">
+            The slug is used in the URL. Use lowercase letters and hyphens only.
           </p>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Category
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Category</DialogTitle>
-              <DialogDescription>
-                Create a new category for your excursions.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Category Name</Label>
-                <Input 
-                  id="name" 
-                  placeholder="Enter category name" 
-                  value={newCategory.name}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
-                <Input 
-                  id="slug" 
-                  placeholder="Enter category slug" 
-                  value={newCategory.slug}
-                  onChange={handleInputChange}
-                />
-                <p className="text-xs text-muted-foreground">
-                  The slug is used in the URL. Use lowercase letters and hyphens only.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Input 
-                  id="description" 
-                  placeholder="Enter category description" 
-                  value={newCategory.description}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleAddCategory}>Add Category</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Input 
+            id="description" 
+            placeholder="Enter category description" 
+            value={newCategory.description}
+            onChange={handleInputChange}
+          />
+        </div>
       </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+        <Button onClick={handleAddCategory}>Add Category</Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+
+  return (
+    <div className="space-y-4">
+      {showHeading && (
+        <div className="flex flex-row items-center justify-between pb-2">
+          <div>
+            <h2 className="text-xl font-semibold">Categories</h2>
+            <p className="text-sm text-muted-foreground">
+              Organize your excursions with custom categories.
+            </p>
+          </div>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Category
+              </Button>
+            </DialogTrigger>
+            {renderAddDialog()}
+          </Dialog>
+        </div>
+      )}
+
+      {!showHeading && (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          {renderAddDialog()}
+        </Dialog>
+      )}
 
       <Table>
         <TableHeader>
@@ -254,16 +279,14 @@ const CategoryManagement: React.FC = () => {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this category? This action cannot be undone.
+              This action cannot be undone. This will permanently delete the category.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction className="bg-destructive text-destructive-foreground" onClick={confirmDelete}>
-              Delete
-            </AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
