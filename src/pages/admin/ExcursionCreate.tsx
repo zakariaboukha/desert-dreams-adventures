@@ -12,8 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft, UploadCloud } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ImageUploader from '@/components/admin/ImageUploader';
 
 const ExcursionCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -124,18 +125,11 @@ const ExcursionCreate: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="border-2 border-dashed border-border rounded-md p-6 flex flex-col items-center justify-center">
-              <UploadCloud className="h-10 w-10 text-muted-foreground mb-2" />
-              <p className="text-sm text-center text-muted-foreground mb-2">
-                Drag and drop images here or click to upload
-              </p>
-              <Button variant="secondary" size="sm">
-                Choose Files
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">
-                Max 5 images, JPEG or PNG, max 2MB each
-              </p>
-            </div>
+            <ImageUploader 
+              maxFiles={5} 
+              maxSize={2 * 1024 * 1024} 
+              onImagesChange={(images) => console.log("Images updated:", images.length)} 
+            />
           </CardContent>
         </Card>
         
