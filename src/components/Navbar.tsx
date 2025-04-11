@@ -18,6 +18,9 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { t } = useTranslation();
 
+  // Fix the deep type inference issue with a simple React element
+  const themeIcon = theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -30,9 +33,6 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Fix the deep type inference issue by using a simple component
-  const themeIcon = theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
     isScrolled ? 'glass py-3' : 'bg-transparent py-6'

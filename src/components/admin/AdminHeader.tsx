@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useTheme } from '@/contexts/ThemeContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, Language } from '@/contexts/LanguageContext';
 import { 
   Bell, 
   Menu,
@@ -69,11 +70,14 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, t
                 <DropdownMenuItem onClick={() => changeLanguage('en')}>
                   English
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage('ar')}>
-                  العربية
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => changeLanguage('fr')}>
                   Français
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('es')}>
+                  Español
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('de')}>
+                  Deutsch
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
