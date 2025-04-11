@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
 import { X, UploadCloud, AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -33,6 +33,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 }) => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Send images to parent when they change
   useEffect(() => {
@@ -153,6 +154,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     });
   };
 
+  // Handler for the button click
+  const handleButtonClick = () => {
+    // This will programmatically click the hidden file input
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   const { getRootProps, getInputProps, isDragAccept, isDragReject, open } = useDropzone({
     onDrop,
     accept: {
@@ -160,7 +169,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       'image/png': []
     },
     maxSize,
-    noClick: true, // We'll handle clicks manually with our button
+    noClick: true, // Disable automatic click handling
     onDragEnter: () => setIsDragActive(true),
     onDragLeave: () => setIsDragActive(false),
     onDropAccepted: () => setIsDragActive(false),
@@ -187,12 +196,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           ${isDragActive ? 'bg-primary/5' : 'bg-background'}
         `}
       >
-        <input {...getInputProps()} />
+        <input {...getInputProps()} ref={fileInputRef} />
         <UploadCloud className="h-10 w-10 text-muted-foreground mb-2" />
         <p className="text-sm text-center text-muted-foreground mb-2">
           Drag and drop images here or click to upload
         </p>
-        <Button variant="secondary" size="sm" onClick={open}>
+        <Button variant="secondary" size="sm" onClick={handleButtonClick}>
           Choose Files
         </Button>
         <p className="text-xs text-muted-foreground mt-2">
