@@ -31,7 +31,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Simplified theme icon rendering - fixed to avoid complex type inference
+  // Fix the deep type inference issue by using a simple component
   const themeIcon = theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />;
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
