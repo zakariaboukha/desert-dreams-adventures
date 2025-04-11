@@ -105,8 +105,18 @@ class AuthService {
 
   // Logout function
   logout(): void {
+    // Clear all auth data from localStorage
     localStorage.removeItem('auth_user');
     localStorage.removeItem('auth_expiry');
+    
+    // Additional cleanup for future Supabase integration
+    // TODO: For Supabase we would call supabase.auth.signOut()
+    
+    // Clear any other session-related data
+    // This could include JWT tokens, refresh tokens, etc.
+    
+    // For now, just ensure localStorage is cleared
+    console.log('Auth service: User logged out successfully');
   }
 
   // Check if session is expired

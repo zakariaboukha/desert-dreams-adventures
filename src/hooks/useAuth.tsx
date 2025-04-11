@@ -8,7 +8,7 @@ interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
   login: (credentials: UserCredentials) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -73,14 +73,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    authService.logout();
-    setUser(null);
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out",
-    });
-    navigate('/admin/login');
+  const logout = async (): Promise<void> => {
+    try {
+      // Simulate 500ms delay as requested
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Call auth service to clear session
+      authService.logout();
+      
+      // Console log for mock auth flow
+      console.log("Admin session cleared");
+      
+      // Clear user state
+      setUser(null);
+      
+      // Show success toast
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of the admin dashboard",
+      });
+      
+      // Navigate to login page
+      // Using a small delay to ensure toast is visible before redirect
+      setTimeout(() => {
+        navigate('/admin/login');
+      }, 100);
+      
+      /* 
+      // TODO: For future Supabase integration
+      // Replace the above with:
+      // await supabase.auth.signOut()
+      // setUser(null)
+      */
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Sign out failed",
+        description: "There was a problem signing you out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
