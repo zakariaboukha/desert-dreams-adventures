@@ -1,4 +1,3 @@
-
 import React, { useState, FormEvent } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,11 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import { ChevronLeft, Loader2, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ImageUploader, { UploadedImage } from '@/components/admin/ImageUploader';
 import CreationSuccessModal from '@/components/admin/CreationSuccessModal';
 import { toast } from '@/hooks/use-toast';
+import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ExcursionFormData {
   name: string;
@@ -27,6 +28,7 @@ interface ExcursionFormData {
   fullDescription: string;
   maxPeople: string;
   status: string;
+  featured: boolean;
   meetingPoint: string;
   startTime: string;
   endTime: string;
@@ -43,6 +45,7 @@ const initialFormData: ExcursionFormData = {
   fullDescription: '',
   maxPeople: '',
   status: 'active',
+  featured: false,
   meetingPoint: '',
   startTime: '',
   endTime: '',
@@ -72,8 +75,11 @@ const ExcursionCreate: React.FC = () => {
     console.log("Images updated:", images.length);
   };
 
+  const handleSwitchChange = (key: keyof ExcursionFormData) => (checked: boolean) => {
+    setFormData(prev => ({ ...prev, [key]: checked }));
+  };
+
   const isFormValid = () => {
-    // Basic validation - require name, category, price
     return formData.name.trim() !== '' && 
            formData.category !== '' && 
            formData.price.trim() !== '';
@@ -99,10 +105,8 @@ const ExcursionCreate: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // Mock API call with timeout
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Mock successful creation
       const mockExcursionId = `exc-${Date.now().toString().slice(-6)}`;
       setCreatedExcursionId(mockExcursionId);
       
@@ -116,7 +120,6 @@ const ExcursionCreate: React.FC = () => {
         }))
       });
 
-      // Show success modal
       setSuccessModalOpen(true);
       
       toast({
@@ -274,6 +277,36 @@ const ExcursionCreate: React.FC = () => {
                     <SelectItem value="inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor="featured" className="cursor-pointer">Feature this excursion</Label>
+                    <Star className="h-4 w-4 text-amber-400" />
+                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="text-xs text-muted-foreground cursor-help">What does this do?</div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm">Featured excursions appear on the homepage</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <div className="flex items-center">
+                  <Switch
+                    id="featured"
+                    checked={formData.featured}
+                    onCheckedChange={handleSwitchChange('featured')}
+                    className="data-[state=checked]:bg-amber-500"
+                  />
+                  <Label htmlFor="featured" className="ml-2 text-sm text-muted-foreground">
+                    {formData.featured ? 'This excursion will be featured on the homepage' : 'This excursion will not be featured'}
+                  </Label>
+                </div>
               </div>
             </CardContent>
           </Card>
