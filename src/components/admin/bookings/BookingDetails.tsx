@@ -15,8 +15,10 @@ import {
   Clock,
   XCircle,
   PrinterIcon,
-  Send
+  Send,
+  Save
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Booking {
   id: string;
@@ -38,6 +40,8 @@ interface BookingDetailsProps {
 
 const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, onClose }) => {
   const [status, setStatus] = useState(booking.status);
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
 
   const getStatusIcon = () => {
     switch (status) {
@@ -68,6 +72,24 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, onClose }) => 
   const updateStatus = (newStatus: string) => {
     setStatus(newStatus);
     // In a real application, we would make an API call to update the status
+  };
+
+  const saveBooking = () => {
+    setSaving(true);
+    
+    // Simulate API call with setTimeout
+    setTimeout(() => {
+      setSaving(false);
+      
+      // Show success toast notification
+      toast({
+        title: "Booking updated",
+        description: `Booking #${booking.id} has been updated to ${status}`,
+        variant: "default",
+      });
+      
+      // In a real app, you would save the updated booking data to the server here
+    }, 1000);
   };
 
   return (
@@ -192,6 +214,16 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, onClose }) => 
             <Button variant="outline" size="sm" className="w-full">
               <Send className="h-4 w-4 mr-2" />
               Email
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full"
+              onClick={saveBooking}
+              disabled={saving}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {saving ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
