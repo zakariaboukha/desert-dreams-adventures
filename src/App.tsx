@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AuthProvider } from "@/hooks/useAuth";
+import ProtectedRoute from "@/components/admin/ProtectedRoute";
 import Index from "./pages/Index";
 import Destinations from "./pages/Destinations";
 import DestinationDetail from "./pages/DestinationDetail";
@@ -15,6 +17,7 @@ import Contact from "./pages/Contact";
 import Booking from "./pages/Booking";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./layouts/AdminLayout";
+import Login from "./pages/admin/Login";
 
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -37,36 +40,44 @@ const App = () => {
         <LanguageProvider>
           <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/destinations" element={<Destinations />} />
-                  <Route path="/destinations/:id" element={<DestinationDetail />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/booking" element={<Booking />} />
-                  
-                  {/* Admin Routes */}
-                  <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<Dashboard />} />
-                    <Route path="excursions" element={<Excursions />} />
-                    <Route path="excursions/create" element={<ExcursionCreate />} />
-                    <Route path="excursions/categories" element={<ExcursionCategories />} />
-                    <Route path="bookings" element={<Bookings />} />
-                    <Route path="users" element={<Users />} />
-                    <Route path="orders" element={<Orders />} />
-                    <Route path="reports" element={<Reports />} />
-                    <Route path="content" element={<Content />} />
-                    <Route path="settings" element={<Settings />} />
-                  </Route>
-                  
-                  {/* 404 Route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </TooltipProvider>
+              <AuthProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<Index />} />
+                    <Route path="/destinations" element={<Destinations />} />
+                    <Route path="/destinations/:id" element={<DestinationDetail />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/booking" element={<Booking />} />
+                    
+                    {/* Admin Auth Route */}
+                    <Route path="/admin/login" element={<Login />} />
+                    
+                    {/* Protected Admin Routes */}
+                    <Route element={<ProtectedRoute />}>
+                      <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<Dashboard />} />
+                        <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="excursions" element={<Excursions />} />
+                        <Route path="excursions/create" element={<ExcursionCreate />} />
+                        <Route path="excursions/categories" element={<ExcursionCategories />} />
+                        <Route path="bookings" element={<Bookings />} />
+                        <Route path="users" element={<Users />} />
+                        <Route path="orders" element={<Orders />} />
+                        <Route path="reports" element={<Reports />} />
+                        <Route path="content" element={<Content />} />
+                        <Route path="settings" element={<Settings />} />
+                      </Route>
+                    </Route>
+                    
+                    {/* 404 Route */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </TooltipProvider>
+              </AuthProvider>
             </BrowserRouter>
           </QueryClientProvider>
         </LanguageProvider>

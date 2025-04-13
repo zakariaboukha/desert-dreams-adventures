@@ -1,7 +1,8 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useTheme } from '@/contexts/ThemeContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, Language } from '@/contexts/LanguageContext';
 import { 
   Bell, 
   Menu,
@@ -9,7 +10,8 @@ import {
   Sun,
   User,
   Globe,
-  ChevronDown
+  ChevronDown,
+  LogOut
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -19,6 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from '@/hooks/useAuth';
+import { Loader2 } from 'lucide-react';
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
@@ -29,6 +33,21 @@ interface AdminHeaderProps {
 const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, toggleMobile }) => {
   const { theme, toggleTheme } = useTheme();
   const { language, changeLanguage } = useLanguage();
+  const { logout, user } = useAuth();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await logout();
+      // Note: The logout function in useAuth already handles redirect and toast notifications
+    } catch (error) {
+      console.error("Sign out failed:", error);
+      // Error handling is managed in the logout function within useAuth
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -69,11 +88,14 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, t
                 <DropdownMenuItem onClick={() => changeLanguage('en')}>
                   English
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage('ar')}>
-                  العربية
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => changeLanguage('fr')}>
                   Français
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('es')}>
+                  Español
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('de')}>
+                  Deutsch
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -109,8 +131,18 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, t
                 <DropdownMenuItem>
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Sign out
+                <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
+                  {isSigningOut ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <span>Signing out...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign out</span>
+                    </>
+                  )}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
