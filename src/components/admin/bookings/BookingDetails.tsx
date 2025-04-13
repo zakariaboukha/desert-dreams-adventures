@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +40,8 @@ interface BookingDetailsProps {
 const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, onClose }) => {
   const [status, setStatus] = useState(booking.status);
   const [saving, setSaving] = useState(false);
+  const [printing, setPrinting] = useState(false);
+  const [sending, setSending] = useState(false);
   const { toast } = useToast();
 
   const getStatusIcon = () => {
@@ -90,6 +91,43 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, onClose }) => 
       
       // In a real app, you would save the updated booking data to the server here
     }, 1000);
+  };
+
+  const printBooking = () => {
+    setPrinting(true);
+    
+    // Simulate print process
+    setTimeout(() => {
+      setPrinting(false);
+      
+      // Show success toast notification
+      toast({
+        title: "Print request sent",
+        description: `Booking #${booking.id} details have been sent to printer`,
+        variant: "default",
+      });
+      
+      // In a real app, you would trigger print functionality here
+      // window.print();
+    }, 800);
+  };
+
+  const emailBooking = () => {
+    setSending(true);
+    
+    // Simulate email sending
+    setTimeout(() => {
+      setSending(false);
+      
+      // Show success toast notification
+      toast({
+        title: "Email sent",
+        description: `Booking details sent to ${booking.email}`,
+        variant: "default",
+      });
+      
+      // In a real app, you would send an email with booking details
+    }, 1500);
   };
 
   return (
@@ -207,13 +245,25 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, onClose }) => 
           </div>
           
           <div className="flex gap-2 pt-2">
-            <Button variant="outline" size="sm" className="w-full">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full"
+              onClick={printBooking}
+              disabled={printing}
+            >
               <PrinterIcon className="h-4 w-4 mr-2" />
-              Print
+              {printing ? "Printing..." : "Print"}
             </Button>
-            <Button variant="outline" size="sm" className="w-full">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full"
+              onClick={emailBooking}
+              disabled={sending}
+            >
               <Send className="h-4 w-4 mr-2" />
-              Email
+              {sending ? "Sending..." : "Email"}
             </Button>
             <Button 
               variant="outline" 
