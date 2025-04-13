@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Search, Plus, UserPlus, MoreHorizontal, Eye, Edit, Key, Ban, MoveDown } from 'lucide-react';
+import { Search, Plus, UserPlus, MoreHorizontal, Eye, Edit, Key, Ban, MoveDown, Loader2, CheckCircle2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 // Mock users data
 const users = [
@@ -87,7 +88,29 @@ const users = [
   },
 ];
 
+interface NewUserFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  password: string;
+}
+
+const initialFormData: NewUserFormData = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  role: 'customer',
+  password: ''
+};
+
 const Users: React.FC = () => {
+  const [newUserFormData, setNewUserFormData] = useState<NewUserFormData>(initialFormData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [createdUserId, setCreatedUserId] = useState<number | null>(null);
+
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'admin':
@@ -108,6 +131,87 @@ const Users: React.FC = () => {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setNewUserFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setNewUserFormData(prev => ({ ...prev, role: e.target.value }));
+  };
+
+  const isFormValid = () => {
+    return (
+      newUserFormData.firstName.trim() !== '' &&
+      newUserFormData.lastName.trim() !== '' &&
+      newUserFormData.email.trim() !== '' &&
+      newUserFormData.password.trim() !== ''
+    );
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isFormValid()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Simulate API call with a delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Create a mock new user ID
+      const newUserId = Math.max(...users.map(user => user.id)) + 1;
+      setCreatedUserId(newUserId);
+      
+      console.log("User created (mock):", {
+        id: newUserId,
+        name: `${newUserFormData.firstName} ${newUserFormData.lastName}`,
+        email: newUserFormData.email,
+        role: newUserFormData.role,
+        status: 'active',
+        lastLogin: 'Never',
+        actions: 0
+      });
+
+      // Show success dialog
+      setShowSuccessDialog(true);
+      setDialogOpen(false);
+      
+      toast({
+        title: "Success",
+        description: "User created successfully",
+      });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create user. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseSuccessDialog = () => {
+    setShowSuccessDialog(false);
+    setNewUserFormData(initialFormData);
+  };
+
+  const handleCreateAnotherUser = () => {
+    setShowSuccessDialog(false);
+    setNewUserFormData(initialFormData);
+    setDialogOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -117,7 +221,7 @@ const Users: React.FC = () => {
             Manage users and their access permissions.
           </p>
         </div>
-        <Dialog>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <UserPlus className="h-4 w-4 mr-2" />
@@ -131,38 +235,82 @@ const Users: React.FC = () => {
                 Create a new user account.
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label htmlFor="first-name">First name</label>
-                  <Input id="first-name" placeholder="Enter first name" />
+            <form onSubmit={handleCreateUser}>
+              <div className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="firstName">First name</label>
+                    <Input 
+                      id="firstName" 
+                      placeholder="Enter first name"
+                      value={newUserFormData.firstName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="lastName">Last name</label>
+                    <Input 
+                      id="lastName" 
+                      placeholder="Enter last name"
+                      value={newUserFormData.lastName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="last-name">Last name</label>
-                  <Input id="last-name" placeholder="Enter last name" />
+                  <label htmlFor="email">Email</label>
+                  <Input 
+                    id="email" 
+                    placeholder="Enter email address" 
+                    type="email"
+                    value={newUserFormData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="role">Role</label>
+                  <select 
+                    id="role" 
+                    className="w-full border border-input rounded-md p-2"
+                    value={newUserFormData.role}
+                    onChange={handleRoleChange}
+                  >
+                    <option value="customer">Customer</option>
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="password">Temporary Password</label>
+                  <Input 
+                    id="password" 
+                    placeholder="Generate password" 
+                    type="password"
+                    value={newUserFormData.password}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label htmlFor="email">Email</label>
-                <Input id="email" placeholder="Enter email address" type="email" />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="role">Role</label>
-                <select id="role" className="w-full border border-input rounded-md p-2">
-                  <option value="customer">Customer</option>
-                  <option value="staff">Staff</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password">Temporary Password</label>
-                <Input id="password" placeholder="Generate password" type="password" />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline">Cancel</Button>
-              <Button>Create User</Button>
-            </DialogFooter>
+              <DialogFooter>
+                <Button variant="outline" type="button" onClick={() => setDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting || !isFormValid()}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create User'
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
@@ -253,6 +401,45 @@ const Users: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* User Creation Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="flex flex-col items-center text-center">
+            <div className="bg-green-100 p-3 rounded-full mb-4">
+              <CheckCircle2 className="h-10 w-10 text-green-600" />
+            </div>
+            <DialogTitle className="text-xl">User Created Successfully</DialogTitle>
+            <p className="text-muted-foreground mt-2">
+              The user "<span className="font-medium">{newUserFormData.firstName} {newUserFormData.lastName}</span>" has been created.
+            </p>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <div className="border-t border-b py-4">
+              <p className="text-center text-sm text-muted-foreground">
+                What would you like to do next?
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button 
+              variant="outline" 
+              className="w-full sm:w-auto"
+              onClick={handleCreateAnotherUser}
+            >
+              Create Another User
+            </Button>
+            <Button 
+              className="w-full sm:w-auto"
+              onClick={handleCloseSuccessDialog}
+            >
+              Back to Users
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
