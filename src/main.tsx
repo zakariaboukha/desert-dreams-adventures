@@ -1,16 +1,19 @@
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
+import { TempoDevtools } from "tempo-devtools";
 
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
+// Initialize Tempo Devtools
+TempoDevtools.init();
 
-const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('Failed to find the root element');
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Failed to find the root element");
 
 const root = createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

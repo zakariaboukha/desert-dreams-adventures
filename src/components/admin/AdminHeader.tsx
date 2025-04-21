@@ -1,18 +1,17 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from '@/contexts/ThemeContext';
-import { useLanguage, Language } from '@/contexts/LanguageContext';
-import { 
-  Bell, 
+import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage, Language } from "@/contexts/LanguageContext";
+import {
+  Bell,
   Menu,
   Moon,
   Sun,
   User,
   Globe,
   ChevronDown,
-  LogOut
-} from 'lucide-react';
+  LogOut,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,8 +20,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from '@/hooks/useAuth';
-import { Loader2 } from 'lucide-react';
+import { useAuth } from "@/hooks/useAuth";
+import { Loader2 } from "lucide-react";
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
@@ -30,7 +29,11 @@ interface AdminHeaderProps {
   toggleMobile: () => void;
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, toggleMobile }) => {
+const AdminHeader: React.FC<AdminHeaderProps> = ({
+  toggleSidebar,
+  sidebarOpen,
+  toggleMobile,
+}) => {
   const { theme, toggleTheme } = useTheme();
   const { language, changeLanguage } = useLanguage();
   const { logout, user } = useAuth();
@@ -63,7 +66,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, t
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle mobile menu</span>
           </Button>
-          
+
           {/* Desktop menu button */}
           <Button
             variant="ghost"
@@ -85,23 +88,23 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, t
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => changeLanguage('en')}>
+                <DropdownMenuItem onClick={() => changeLanguage("en")}>
                   English
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage('fr')}>
+                <DropdownMenuItem onClick={() => changeLanguage("fr")}>
                   Français
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage('es')}>
+                <DropdownMenuItem onClick={() => changeLanguage("es")}>
                   Español
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => changeLanguage('de')}>
+                <DropdownMenuItem onClick={() => changeLanguage("de")}>
                   Deutsch
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              {theme === 'dark' ? (
+              {theme === "dark" ? (
                 <Sun className="h-5 w-5" />
               ) : (
                 <Moon className="h-5 w-5" />
@@ -116,7 +119,10 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, t
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="relative h-8 w-8 rounded-full"
+                >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/avatars/01.png" alt="@admin" />
                     <AvatarFallback>AD</AvatarFallback>
@@ -124,14 +130,21 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen, t
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => (window.location.href = "/admin/profile")}
+                >
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Settings
+                <DropdownMenuItem
+                  onClick={() => (window.location.href = "/admin/settings")}
+                >
+                  <span>Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  disabled={isSigningOut}
+                >
                   {isSigningOut ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

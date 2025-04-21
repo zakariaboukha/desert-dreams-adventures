@@ -1,10 +1,10 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useRoutes } from "react-router-dom";
+import routes from "tempo-routes";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -30,8 +30,14 @@ import Orders from "./pages/admin/Orders";
 import Reports from "./pages/admin/Reports";
 import Content from "./pages/admin/Content";
 import Settings from "./pages/admin/Settings";
+import Profile from "./pages/admin/Profile";
 
 const queryClient = new QueryClient();
+
+// Component to handle Tempo routes
+const TempoRoutes = () => {
+  return import.meta.env.VITE_TEMPO ? useRoutes(routes) : null;
+};
 
 const App = () => {
   return (
@@ -44,35 +50,52 @@ const App = () => {
                 <TooltipProvider>
                   <Toaster />
                   <Sonner />
+                  {/* Tempo routes */}
+                  {import.meta.env.VITE_TEMPO && <TempoRoutes />}
                   <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<Index />} />
                     <Route path="/destinations" element={<Destinations />} />
-                    <Route path="/destinations/:id" element={<DestinationDetail />} />
+                    <Route
+                      path="/destinations/:id"
+                      element={<DestinationDetail />}
+                    />
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/booking" element={<Booking />} />
-                    
+
                     {/* Admin Auth Route */}
                     <Route path="/admin/login" element={<Login />} />
-                    
+
                     {/* Protected Admin Routes */}
                     <Route element={<ProtectedRoute />}>
                       <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<Dashboard />} />
                         <Route path="dashboard" element={<Dashboard />} />
                         <Route path="excursions" element={<Excursions />} />
-                        <Route path="excursions/create" element={<ExcursionCreate />} />
-                        <Route path="excursions/categories" element={<ExcursionCategories />} />
+                        <Route
+                          path="excursions/create"
+                          element={<ExcursionCreate />}
+                        />
+                        <Route
+                          path="excursions/categories"
+                          element={<ExcursionCategories />}
+                        />
                         <Route path="bookings" element={<Bookings />} />
                         <Route path="users" element={<Users />} />
                         <Route path="orders" element={<Orders />} />
                         <Route path="reports" element={<Reports />} />
                         <Route path="content" element={<Content />} />
                         <Route path="settings" element={<Settings />} />
+                        <Route path="profile" element={<Profile />} />
                       </Route>
                     </Route>
-                    
+
+                    {/* Allow Tempo routes before catchall */}
+                    {import.meta.env.VITE_TEMPO && (
+                      <Route path="/tempobook/*" />
+                    )}
+
                     {/* 404 Route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
