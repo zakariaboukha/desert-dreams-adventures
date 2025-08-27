@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
         }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 to-background/40 dark:from-background/90 dark:to-background/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background/15 to-background/0 dark:from-background/90 dark:to-background/30"></div>
       </div>
 
       {/* Hero Content */}
@@ -27,10 +27,10 @@ const Hero: React.FC = () => {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             {t('hero.title').split('Desert').map((part, index, array) => 
               index === array.length - 1 ? 
-                <React.Fragment key={index}>{part}</React.Fragment> : 
-                <React.Fragment key={index}>
+                <span key={index} style={{display: 'contents'}}>{part}</span> : 
+                <span key={index} style={{display: 'contents'}}>
                   {part}<span className="text-primary">Desert</span>
-                </React.Fragment>
+                </span>
             )}
           </h1>
           <p className="text-lg md:text-xl mb-8 text-foreground/90 max-w-2xl">

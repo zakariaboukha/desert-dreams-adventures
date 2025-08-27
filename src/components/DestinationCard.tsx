@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, MapPin, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export interface DestinationProps {
@@ -11,6 +11,7 @@ export interface DestinationProps {
   price: number;
   image: string;
   description: string;
+  type?: 'trip' | 'excursion'; // Add type prop
 }
 
 const DestinationCard: React.FC<DestinationProps> = ({
@@ -21,7 +22,11 @@ const DestinationCard: React.FC<DestinationProps> = ({
   price,
   image,
   description,
+  type = 'trip', // Default to trip
 }) => {
+  // Determine the correct link path based on type
+  const linkPath = type === 'excursion' ? `/excursions/${id}` : `/destinations/${id}`;
+
   return (
     <div className="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-xl card-hover">
       {/* Image Container */}
@@ -50,17 +55,10 @@ const DestinationCard: React.FC<DestinationProps> = ({
           <span className="text-sm">{duration}</span>
         </div>
         
-        <p className="text-foreground/80 mb-4 line-clamp-2">
+        <p className="text-foreground/80 mb-0 line-clamp-2">
           {description}
         </p>
-        
-        <Link 
-          to={`/destinations/${id}`} 
-          className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
-        >
-          View Details
-          <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-        </Link>
+        {/* "More Info" / CTA removed for consistency across all DestinationCard instances */}
       </div>
     </div>
   );

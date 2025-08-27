@@ -12,7 +12,7 @@ import {
   FileText,
   Package,
   Map,
-  FolderTree,
+  Luggage,
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
@@ -42,6 +42,12 @@ const getNavigationItems = (t: (key: string) => string) => [
     href: "/admin/excursions",
     icon: Map,
     match: /^\/admin\/excursions/,
+  },
+  {
+    name: "Trips",
+    href: "/admin/trips",
+    icon: Luggage,
+    match: /^\/admin\/trips/,
   },
   {
     name: t("admin.orders"),

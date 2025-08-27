@@ -2,7 +2,11 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService, AuthUser, UserCredentials } from '@/lib/auth';
+import { supabaseAuthService } from '@/lib/supabaseAuth';
 import { toast } from '@/hooks/use-toast';
+
+// Use Supabase auth service if environment variable is set
+const useSupabase = import.meta.env.VITE_USE_SUPABASE === 'true';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -21,19 +25,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Check for existing authentication on mount
   useEffect(() => {
-    const checkAuth = () => {
-      // Check for session expiry first
-      if (authService.isSessionExpired()) {
-        authService.logout();
-        setUser(null);
-        setIsLoading(false);
-        return;
-      }
+    const checkAuth = async () => {
+      if (useSupabase) {
+        // Use Supabase authentication
+        try {
+          const currentUser = await supabaseAuthService.getUser();
+          setUser(currentUser);
+        } catch (error) {
+          console.error('Error checking Supabase auth:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        // Use mock authentication
+        // Check for session expiry first
+        if (authService.isSessionExpired()) {
+          authService.logout();
+          setUser(null);
+          setIsLoading(false);
+          return;
+        }
 
-      // Check for authenticated user
-      const currentUser = authService.getUser();
-      setUser(currentUser);
-      setIsLoading(false);
+        // Check for authenticated user
+        const currentUser = authService.getUser();
+        setUser(currentUser);
+        setIsLoading(false);
+      }
     };
 
     checkAuth();
@@ -43,7 +60,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
-      const result = await authService.login(credentials);
+      let result;
+      
+      if (useSupabase) {
+        // Use Supabase authentication
+        result = await supabaseAuthService.login(credentials);
+      } else {
+        // Use mock authentication
+        result = await authService.login(credentials);
+      }
       
       if (result.success && result.user) {
         setUser(result.user);
@@ -75,14 +100,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async (): Promise<void> => {
     try {
-      // Simulate 500ms delay as requested
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Call auth service to clear session
-      authService.logout();
-      
-      // Console log for mock auth flow
-      console.log("Admin session cleared");
+      if (useSupabase) {
+        // Use Supabase authentication
+        await supabaseAuthService.logout();
+      } else {
+        // Simulate 500ms delay as requested for mock auth
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Call auth service to clear session
+        authService.logout();
+        
+        // Console log for mock auth flow
+        console.log("Admin session cleared");
+      }
       
       // Clear user state
       setUser(null);
@@ -98,13 +128,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setTimeout(() => {
         navigate('/admin/login');
       }, 100);
-      
-      /* 
-      // TODO: For future Supabase integration
-      // Replace the above with:
-      // await supabase.auth.signOut()
-      // setUser(null)
-      */
     } catch (error) {
       console.error("Logout error:", error);
       toast({

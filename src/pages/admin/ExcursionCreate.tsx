@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft, Loader2, Star } from 'lucide-react';
+import { ChevronLeft, Loader2, Star, Plus, Minus, Upload, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ImageUploader, { UploadedImage } from '@/components/admin/ImageUploader';
 import CreationSuccessModal from '@/components/admin/CreationSuccessModal';
@@ -19,8 +19,17 @@ import { toast } from '@/hooks/use-toast';
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+// Enhanced interface with new fields
+interface ItineraryItem {
+  id: string;
+  time: string;
+  title: string;
+  description: string;
+}
+
 interface ExcursionFormData {
   name: string;
+  tagline: string;
   category: string;
   price: string;
   duration: string;
@@ -32,12 +41,20 @@ interface ExcursionFormData {
   meetingPoint: string;
   startTime: string;
   endTime: string;
-  included: string;
-  notIncluded: string;
+  included: string[]; // Changed from string to string[]
+  notIncluded: string[]; // Changed from string to string[]
+  highlights: string[];
+  itinerary: ItineraryItem[];
+  ageRestrictions: string;
+  fitnessLevel: string;
+  medicalConditions: string;
+  whatToBring: string[];
+  heroImage: File | null;
 }
 
 const initialFormData: ExcursionFormData = {
   name: '',
+  tagline: '',
   category: '',
   price: '',
   duration: '',
@@ -49,8 +66,356 @@ const initialFormData: ExcursionFormData = {
   meetingPoint: '',
   startTime: '',
   endTime: '',
-  included: '',
-  notIncluded: '',
+  included: [], // Changed from empty string to empty array
+  notIncluded: [], // Changed from empty string to empty array
+  highlights: [''],
+  itinerary: [{ id: '1', time: '', title: '', description: '' }],
+  ageRestrictions: '',
+  fitnessLevel: '',
+  medicalConditions: '',
+  whatToBring: [''],
+  heroImage: null,
+};
+
+// Hero Image Upload Component
+const HeroImageUploader: React.FC<{
+  heroImage: File | null;
+  onImageChange: (file: File | null) => void;
+}> = ({ heroImage, onImageChange }) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid File Type",
+          description: "Please select an image file",
+          variant: "destructive"
+        });
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File Too Large",
+          description: "Please select an image smaller than 5MB",
+          variant: "destructive"
+        });
+        return;
+      }
+      onImageChange(file);
+    }
+  };
+
+  const removeImage = () => {
+    onImageChange(null);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+        {heroImage ? (
+          <div className="relative">
+            <img
+              src={URL.createObjectURL(heroImage)}
+              alt="Hero preview"
+              className="max-h-48 mx-auto rounded-lg"
+            />
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              className="absolute top-2 right-2"
+              onClick={removeImage}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-sm text-muted-foreground mb-2">Upload hero image for banner</p>
+            <p className="text-xs text-muted-foreground mb-4">PNG, JPG up to 5MB</p>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              id="hero-upload"
+            />
+            <Button type="button" variant="outline" asChild>
+              <label htmlFor="hero-upload" className="cursor-pointer">
+                Select Image
+              </label>
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Highlights List Component
+const HighlightsList: React.FC<{
+  highlights: string[];
+  onChange: (highlights: string[]) => void;
+}> = ({ highlights, onChange }) => {
+  const addHighlight = () => {
+    onChange([...highlights, '']);
+  };
+
+  const removeHighlight = (index: number) => {
+    onChange(highlights.filter((_, i) => i !== index));
+  };
+
+  const updateHighlight = (index: number, value: string) => {
+    const updated = [...highlights];
+    updated[index] = value;
+    onChange(updated);
+  };
+
+  return (
+    <div className="space-y-3">
+      {highlights.map((highlight, index) => (
+        <div key={index} className="flex gap-2">
+          <Input
+            placeholder={`Highlight ${index + 1}`}
+            value={highlight}
+            onChange={(e) => updateHighlight(index, e.target.value)}
+          />
+          {highlights.length > 1 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => removeHighlight(index)}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      ))}
+      <Button type="button" variant="outline" size="sm" onClick={addHighlight}>
+        <Plus className="h-4 w-4 mr-2" />
+        Add Highlight
+      </Button>
+    </div>
+  );
+};
+
+// Day Itinerary Component
+const DayItinerary: React.FC<{
+  itinerary: ItineraryItem[];
+  onChange: (itinerary: ItineraryItem[]) => void;
+}> = ({ itinerary, onChange }) => {
+  const addItineraryItem = () => {
+    const newItem: ItineraryItem = {
+      id: Date.now().toString(),
+      time: '',
+      title: '',
+      description: ''
+    };
+    onChange([...itinerary, newItem]);
+  };
+
+  const removeItineraryItem = (id: string) => {
+    onChange(itinerary.filter(item => item.id !== id));
+  };
+
+  const updateItineraryItem = (id: string, field: keyof ItineraryItem, value: string) => {
+    const updated = itinerary.map(item =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    onChange(updated);
+  };
+
+  return (
+    <div className="space-y-4">
+      {itinerary.map((item, index) => (
+        <Card key={item.id} className="p-4">
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="font-medium">Timeline Item {index + 1}</h4>
+            {itinerary.length > 1 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => removeItineraryItem(item.id)}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <div className="grid gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Time</Label>
+                <Input
+                  type="time"
+                  value={item.time}
+                  onChange={(e) => updateItineraryItem(item.id, 'time', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label>Title</Label>
+                <Input
+                  placeholder="Activity title"
+                  value={item.title}
+                  onChange={(e) => updateItineraryItem(item.id, 'title', e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Description</Label>
+              <Textarea
+                placeholder="Describe this activity"
+                rows={2}
+                value={item.description}
+                onChange={(e) => updateItineraryItem(item.id, 'description', e.target.value)}
+              />
+            </div>
+          </div>
+        </Card>
+      ))}
+      <Button type="button" variant="outline" onClick={addItineraryItem}>
+        <Plus className="h-4 w-4 mr-2" />
+        Add Timeline Item
+      </Button>
+    </div>
+  );
+};
+
+// What to Bring List Component
+const WhatToBringList: React.FC<{
+  items: string[];
+  onChange: (items: string[]) => void;
+}> = ({ items, onChange }) => {
+  const addItem = () => {
+    onChange([...items, '']);
+  };
+
+  const removeItem = (index: number) => {
+    onChange(items.filter((_, i) => i !== index));
+  };
+
+  const updateItem = (index: number, value: string) => {
+    const updated = [...items];
+    updated[index] = value;
+    onChange(updated);
+  };
+
+  return (
+    <div className="space-y-3">
+      {items.map((item, index) => (
+        <div key={index} className="flex gap-2">
+          <Input
+            placeholder={`Item ${index + 1}`}
+            value={item}
+            onChange={(e) => updateItem(index, e.target.value)}
+          />
+          {items.length > 1 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => removeItem(index)}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      ))}
+      <Button type="button" variant="outline" size="sm" onClick={addItem}>
+        <Plus className="h-4 w-4 mr-2" />
+        Add Item
+      </Button>
+    </div>
+  );
+};
+
+// RepeatableInputList Component
+const RepeatableInputList: React.FC<{
+  items: string[];
+  onChange: (items: string[]) => void;
+  placeholder: string;
+  maxItems?: number;
+}> = ({ items, onChange, placeholder, maxItems = 15 }) => {
+  const addItem = () => {
+    if (items.length < maxItems) {
+      onChange([...items, '']);
+    } else {
+      toast({
+        title: "Maximum items reached",
+        description: `You can only add up to ${maxItems} items.`,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const removeItem = (index: number) => {
+    if (items.length > 1) {
+      const newItems = items.filter((_, i) => i !== index);
+      onChange(newItems);
+    }
+  };
+
+  const updateItem = (index: number, value: string) => {
+    const newItems = [...items];
+    newItems[index] = value;
+    onChange(newItems);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      addItem();
+    } else if (e.key === 'Backspace' && items[index] === '' && items.length > 1) {
+      e.preventDefault();
+      removeItem(index);
+    }
+  };
+
+  // Ensure at least one empty item exists
+  const displayItems = items.length === 0 ? [''] : items;
+
+  return (
+    <div className="space-y-3">
+      {displayItems.map((item, index) => (
+        <div key={index} className="flex items-center gap-2">
+          <Input
+            value={item}
+            onChange={(e) => updateItem(index, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            placeholder={placeholder}
+            className="flex-1"
+          />
+          {displayItems.length > 1 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => removeItem(index)}
+              className="px-2 py-1 h-9 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      ))}
+      
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={addItem}
+        disabled={items.length >= maxItems}
+        className="w-full mt-2 text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200"
+      >
+        <Plus className="h-4 w-4 mr-2" />
+        Add Item
+      </Button>
+    </div>
+  );
 };
 
 const ExcursionCreate: React.FC = () => {
@@ -72,11 +437,35 @@ const ExcursionCreate: React.FC = () => {
 
   const handleImagesChange = (images: UploadedImage[]) => {
     setUploadedImages(images);
-    console.log("Images updated:", images.length);
   };
 
   const handleSwitchChange = (key: keyof ExcursionFormData) => (checked: boolean) => {
     setFormData(prev => ({ ...prev, [key]: checked }));
+  };
+
+  // New handlers for repeatable lists
+  const handleIncludedChange = (items: string[]) => {
+    setFormData(prev => ({ ...prev, included: items }));
+  };
+
+  const handleNotIncludedChange = (items: string[]) => {
+    setFormData(prev => ({ ...prev, notIncluded: items }));
+  };
+
+  const handleHeroImageChange = (file: File | null) => {
+    setFormData(prev => ({ ...prev, heroImage: file }));
+  };
+
+  const handleHighlightsChange = (highlights: string[]) => {
+    setFormData(prev => ({ ...prev, highlights }));
+  };
+
+  const handleItineraryChange = (itinerary: ItineraryItem[]) => {
+    setFormData(prev => ({ ...prev, itinerary }));
+  };
+
+  const handleWhatToBringChange = (whatToBring: string[]) => {
+    setFormData(prev => ({ ...prev, whatToBring }));
   };
 
   const isFormValid = () => {
@@ -110,21 +499,26 @@ const ExcursionCreate: React.FC = () => {
       const mockExcursionId = `exc-${Date.now().toString().slice(-6)}`;
       setCreatedExcursionId(mockExcursionId);
       
-      console.log("Excursion created (mock):", {
+      console.log("Enhanced Excursion created (mock):", {
         ...formData,
         id: mockExcursionId,
         images: uploadedImages.map(img => ({
           name: img.file.name,
           size: img.file.size,
           type: img.file.type
-        }))
+        })),
+        heroImage: formData.heroImage ? {
+          name: formData.heroImage.name,
+          size: formData.heroImage.size,
+          type: formData.heroImage.type
+        } : null
       });
 
       setSuccessModalOpen(true);
       
       toast({
         title: "Success",
-        description: "Excursion created successfully",
+        description: "Excursion created successfully with all enhancements",
       });
     } catch (error) {
       console.error("Error creating excursion:", error);
@@ -156,14 +550,15 @@ const ExcursionCreate: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight mb-1">Create New Excursion</h1>
           <p className="text-muted-foreground">
-            Add a new excursion to your catalog.
+            Add a new excursion with comprehensive details to your catalog.
           </p>
         </div>
       </div>
       
       <form onSubmit={handleSubmit}>
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="md:col-span-1 md:row-span-2">
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Basic Information */}
+          <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
               <CardDescription>
@@ -172,7 +567,7 @@ const ExcursionCreate: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Excursion Name</Label>
+                <Label htmlFor="name">Excursion Name *</Label>
                 <Input 
                   id="name" 
                   placeholder="Enter excursion name" 
@@ -181,28 +576,39 @@ const ExcursionCreate: React.FC = () => {
                   required
                 />
               </div>
+              
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Select 
-                  value={formData.category} 
-                  onValueChange={(value) => handleSelectChange('category', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="safari">Safari</SelectItem>
-                    <SelectItem value="wildlife">Wildlife</SelectItem>
-                    <SelectItem value="nature">Nature</SelectItem>
-                    <SelectItem value="adventure">Adventure</SelectItem>
-                    <SelectItem value="cultural">Cultural</SelectItem>
-                    <SelectItem value="special">Special</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="tagline">Tagline</Label>
+                <Input 
+                  id="tagline" 
+                  placeholder="Short descriptive phrase" 
+                  value={formData.tagline}
+                  onChange={handleInputChange}
+                />
               </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price (USD)</Label>
+                  <Label htmlFor="category">Category *</Label>
+                  <Select 
+                    value={formData.category} 
+                    onValueChange={(value) => handleSelectChange('category', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="safari">Safari</SelectItem>
+                      <SelectItem value="wildlife">Wildlife</SelectItem>
+                      <SelectItem value="nature">Nature</SelectItem>
+                      <SelectItem value="adventure">Adventure</SelectItem>
+                      <SelectItem value="cultural">Cultural</SelectItem>
+                      <SelectItem value="special">Special</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="price">Price (USD) *</Label>
                   <Input 
                     id="price" 
                     type="number" 
@@ -214,6 +620,9 @@ const ExcursionCreate: React.FC = () => {
                     required
                   />
                 </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="duration">Duration (hours)</Label>
                   <Input 
@@ -226,7 +635,19 @@ const ExcursionCreate: React.FC = () => {
                     onChange={handleInputChange}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="maxPeople">Max People</Label>
+                  <Input 
+                    id="maxPeople" 
+                    type="number" 
+                    min="1" 
+                    placeholder="10" 
+                    value={formData.maxPeople}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="shortDescription">Short Description</Label>
                 <Textarea 
@@ -238,6 +659,7 @@ const ExcursionCreate: React.FC = () => {
                   onChange={handleInputChange}
                 />
               </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="fullDescription">Full Description</Label>
                 <Textarea 
@@ -249,22 +671,214 @@ const ExcursionCreate: React.FC = () => {
                   onChange={handleInputChange}
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Hero Image Upload */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Hero Image</CardTitle>
+              <CardDescription>
+                Upload a banner image for this excursion.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <HeroImageUploader
+                heroImage={formData.heroImage}
+                onImageChange={handleHeroImageChange}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Excursion Highlights */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Excursion Highlights</CardTitle>
+              <CardDescription>
+                Add key highlights and features of this excursion.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <HighlightsList
+                highlights={formData.highlights}
+                onChange={handleHighlightsChange}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Gallery Images */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Gallery Images</CardTitle>
+              <CardDescription>
+                Upload additional images for the gallery.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ImageUploader 
+                maxFiles={5} 
+                maxSize={2 * 1024 * 1024} 
+                onImagesChange={handleImagesChange} 
+              />
+            </CardContent>
+          </Card>
+
+          {/* Day Itinerary */}
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <CardTitle>Day Itinerary (Timeline)</CardTitle>
+              <CardDescription>
+                Create a detailed timeline for the excursion activities.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DayItinerary
+                itinerary={formData.itinerary}
+                onChange={handleItineraryChange}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Requirements & Restrictions */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Requirements & Restrictions</CardTitle>
+              <CardDescription>
+                Specify requirements and restrictions for participants.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="maxPeople">Max People</Label>
+                <Label htmlFor="ageRestrictions">Age Restrictions</Label>
                 <Input 
-                  id="maxPeople" 
-                  type="number" 
-                  min="1" 
-                  placeholder="10" 
-                  value={formData.maxPeople}
+                  id="ageRestrictions" 
+                  placeholder="e.g., Minimum age 12 years" 
+                  value={formData.ageRestrictions}
                   onChange={handleInputChange}
                 />
               </div>
+              
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="status">Status</Label>
-                  <div className="text-xs text-muted-foreground">Is this excursion active?</div>
+                <Label htmlFor="fitnessLevel">Fitness Level Required</Label>
+                <Select 
+                  value={formData.fitnessLevel} 
+                  onValueChange={(value) => handleSelectChange('fitnessLevel', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select fitness level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low - Suitable for all</SelectItem>
+                    <SelectItem value="moderate">Moderate - Some walking required</SelectItem>
+                    <SelectItem value="high">High - Good fitness required</SelectItem>
+                    <SelectItem value="extreme">Extreme - Excellent fitness required</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="medicalConditions">Medical Conditions & Warnings</Label>
+                <Textarea 
+                  id="medicalConditions" 
+                  placeholder="Any medical conditions or health warnings" 
+                  className="resize-none" 
+                  rows={3}
+                  value={formData.medicalConditions}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* What to Bring */}
+          <Card>
+            <CardHeader>
+              <CardTitle>What to Bring</CardTitle>
+              <CardDescription>
+                List items participants should bring.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <WhatToBringList
+                items={formData.whatToBring}
+                onChange={handleWhatToBringChange}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Additional Details */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Additional Details</CardTitle>
+              <CardDescription>
+                Logistics and additional information.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="meetingPoint">Meeting Point</Label>
+                <Input 
+                  id="meetingPoint" 
+                  placeholder="Where should customers meet?" 
+                  value={formData.meetingPoint}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startTime">Start Time</Label>
+                  <Input 
+                    id="startTime" 
+                    type="time" 
+                    value={formData.startTime}
+                    onChange={handleInputChange}
+                  />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endTime">End Time</Label>
+                  <Input 
+                    id="endTime" 
+                    type="time" 
+                    value={formData.endTime}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>What's Included</Label>
+                <RepeatableInputList
+                  items={formData.included}
+                  onChange={handleIncludedChange}
+                  placeholder="e.g., Local guide, Traditional lunch, Transportation"
+                  maxItems={15}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>What's Not Included</Label>
+                <RepeatableInputList
+                  items={formData.notIncluded}
+                  onChange={handleNotIncludedChange}
+                  placeholder="e.g., Personal expenses, Travel insurance, Tips"
+                  maxItems={15}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Settings</CardTitle>
+              <CardDescription>
+                Configure excursion settings.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
                 <Select 
                   value={formData.status} 
                   onValueChange={(value) => handleSelectChange('status', value)}
@@ -278,7 +892,7 @@ const ExcursionCreate: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
-
+              
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
@@ -307,84 +921,6 @@ const ExcursionCreate: React.FC = () => {
                     {formData.featured ? 'This excursion will be featured on the homepage' : 'This excursion will not be featured'}
                   </Label>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <CardTitle>Media</CardTitle>
-              <CardDescription>
-                Upload images for this excursion.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ImageUploader 
-                maxFiles={5} 
-                maxSize={2 * 1024 * 1024} 
-                onImagesChange={handleImagesChange} 
-              />
-            </CardContent>
-          </Card>
-          
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <CardTitle>Additional Details</CardTitle>
-              <CardDescription>
-                More information about this excursion.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="meetingPoint">Meeting Point</Label>
-                <Input 
-                  id="meetingPoint" 
-                  placeholder="Where should customers meet?" 
-                  value={formData.meetingPoint}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startTime">Start Time</Label>
-                  <Input 
-                    id="startTime" 
-                    type="time" 
-                    value={formData.startTime}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endTime">End Time</Label>
-                  <Input 
-                    id="endTime" 
-                    type="time" 
-                    value={formData.endTime}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="included">What's Included</Label>
-                <Textarea 
-                  id="included" 
-                  placeholder="Enter items included in the excursion" 
-                  className="resize-none" 
-                  rows={3}
-                  value={formData.included}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="notIncluded">What's Not Included</Label>
-                <Textarea 
-                  id="notIncluded" 
-                  placeholder="Enter items not included in the excursion" 
-                  className="resize-none" 
-                  rows={3}
-                  value={formData.notIncluded}
-                  onChange={handleInputChange}
-                />
               </div>
             </CardContent>
           </Card>

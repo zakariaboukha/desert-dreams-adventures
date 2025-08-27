@@ -47,7 +47,7 @@ const TestimonialSection: React.FC = () => {
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = "https://via.placeholder.com/150";
+                      target.src = "/images/avatar-placeholder.png";
                     }}
                   />
                 </div>

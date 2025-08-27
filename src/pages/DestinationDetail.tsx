@@ -1,9 +1,9 @@
 
+// Top imports (BookingForm removed)
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import BookingForm from '@/components/BookingForm';
 import { getDestinationById } from '@/data/destinations';
 import { Calendar, Clock, MapPin, CheckCircle, XCircle, ChevronLeft, Star } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -84,9 +84,9 @@ const DestinationDetail: React.FC = () => {
       {/* Main Content */}
       <section className="py-16">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 gap-12">
             {/* Left Column - Tour Details */}
-            <div className="lg:col-span-2">
+            <div>
               <Tabs defaultValue="overview">
                 <TabsList className="mb-8">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -188,14 +188,11 @@ const DestinationDetail: React.FC = () => {
               </Tabs>
             </div>
             
-            {/* Right Column - Booking Form */}
-            <div>
-              <BookingForm tourName={destination.id} />
-            </div>
+            {/* Right Column removed (BookingForm sidebar) */}
           </div>
         </div>
       </section>
-      
+
       <Footer />
     </div>
   );

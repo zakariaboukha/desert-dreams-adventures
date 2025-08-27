@@ -1,13 +1,14 @@
 
 {
   "common": {
-    "book_now": "Reservar ahora",
-    "contact_us": "Contáctenos",
-    "explore_destinations": "Explorar destinos"
+    "book_now": "Reservar",
+    "contact_us": "Contáctanos",
+    "explore_destinations": "Explorar Destinos"
   },
   "navbar": {
     "home": "Inicio",
     "destinations": "Destinos",
+    "excursions": "Excursiones",
     "about": "Acerca de",
     "contact": "Contacto"
   },

@@ -23,11 +23,10 @@ import { cn } from "@/lib/utils";
 
 // Mock data for excursions
 const availableExcursions = [
-  { id: '1', name: 'Desert Safari Adventure', price: 129.99 },
-  { id: '2', name: 'Sunset Camel Ride', price: 79.99 },
-  { id: '3', name: 'Oasis Exploration', price: 149.99 },
-  { id: '4', name: 'Dune Bashing Experience', price: 189.99 },
-  { id: '5', name: 'Traditional Bedouin Camp', price: 159.99 },
+  { id: '1', name: 'Oasis Visit', price: 150 },
+  { id: '2', name: 'Atlas Hike', price: 100 },
+  { id: '3', name: 'Desert Safari', price: 120 },
+  { id: '4', name: 'Berber Village Tour', price: 140 },
 ];
 
 interface BookingCreateFormProps {

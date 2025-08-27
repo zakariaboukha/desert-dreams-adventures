@@ -29,7 +29,10 @@ interface Booking {
   date: Date;
   status: string;
   people: number;
+  adults: number;
+  children: number;
   totalAmount: number;
+  booking_type: "trip" | "excursion";
 }
 
 interface BookingDetailsProps {

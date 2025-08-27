@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -16,436 +17,900 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Check, Star } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { 
+  CalendarIcon, 
+  Check, 
+  Star, 
+  Users, 
+  Clock, 
+  MapPin,
+  CreditCard,
+  Shield,
+  ChevronRight,
+  ChevronLeft,
+  X
+} from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+// Import data sources
+import { excursions } from "@/data/excursions";
+import { trips } from "@/data/trips";
+import { BookingContext } from '@/utils/bookingNavigation';
+import BookingSummaryCard, { BookingSummaryData } from './BookingSummaryCard';
+import BookingConfirmationModal from './BookingConfirmationModal';
+
 interface BookingFormProps {
-  tourName?: string;
+  initialContext?: BookingContext;
+  bookingType?: "trip" | "excursion";
+  preSelectedId?: string;
+  onSummaryDataChange?: (data: BookingSummaryData | null) => void;
 }
 
-type BookingStep = "initial" | "tour-review" | "traveler-info" | "payment";
+type BookingType = "trip" | "excursion" | "";
+
+interface FormData {
+  bookingType: BookingType;
+  selectedItem: string;
+  date: Date | undefined;
+  adults: string;
+  children: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  additionalNotes: string;
+}
+
+interface FormErrors {
+  bookingType?: string;
+  selectedItem?: string;
+  date?: string;
+  adults?: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+}
+
+// Transform trip data for consistent interface
+const transformedTrips = trips.map(trip => ({
+  id: trip.slug,
+  name: trip.title,
+  price: trip.price,
+  category: trip.category || "Multi-day",
+  duration: trip.duration,
+  location: trip.location
+}));
+
+// Transform excursion data for consistent interface
+const transformedExcursions = [
+  ...['oasis-visit', 'atlas-hike', 'desert-safari'].map((slug) => {
+    const ex = excursions.find(e => e.slug === slug);
+    return ex ? {
+      id: ex.slug,
+      name: ex.title,
+      price: ex.price,
+      category: "Adventure",
+      duration: ex.duration,
+      location: ex.location
+    } : null;
+  }).filter(Boolean) as Array<{
+    id: string; name: string; price: number; category: string; duration: string; location: string;
+  }>,
+  {
+    id: 'berber-village-tour',
+    name: 'Berber Village Tour',
+    price: 140,
+    category: 'Cultural',
+    duration: '1 day',
+    location: 'Morocco'
+  }
+];
 
 const BookingForm: React.FC<BookingFormProps> = ({
-  tourName = "Desert Oasis Tour",
+  bookingType = "",
+  preSelectedId = "",
+  initialContext,
+  onSummaryDataChange
 }) => {
-  const [currentStep, setCurrentStep] = useState<BookingStep>("initial");
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [guests, setGuests] = useState("2");
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    specialRequests: "",
+  const [searchParams] = useSearchParams();
+  const isInitialized = useRef(false);
+  
+  // Extract context from URL parameters if not provided via props
+  const urlContext = {
+    type: searchParams.get('type') as 'trip' | 'excursion' | null,
+    id: searchParams.get('id'),
+    name: searchParams.get('name'),
+    price: searchParams.get('price') ? Number(searchParams.get('price')) : undefined,
+    location: searchParams.get('location'),
+    duration: searchParams.get('duration'),
+    image: searchParams.get('image')
+  };
+
+  const tripSlug = searchParams.get('trip') || null;
+  const excursionSlug = searchParams.get('excursion') || null;
+
+  // Use URL context if initialContext is not provided
+  const effectiveContext = initialContext || urlContext;
+  
+  const [formData, setFormData] = useState<FormData>(() => {
+    // Initialize state only once with proper context
+    const initialBookingType = effectiveContext.type || bookingType || "";
+    const initialSelectedItem = effectiveContext.id || preSelectedId || "";
+    
+    console.log('Initial booking type:', initialBookingType);
+    
+    return {
+      bookingType: initialBookingType,
+      selectedItem: initialSelectedItem,
+      date: undefined,
+      adults: "1",
+      children: "0",
+      fullName: "",
+      email: "",
+      phone: "",
+      additionalNotes: ""
+    };
   });
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  type PaymentMethod = "card" | "paypal";
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Add these new state variables for the confirmation modal
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmedBookingDetails, setConfirmedBookingDetails] = useState<{
+    tripName: string;
+    bookingId: string;
+    date: string;
+    adults: number;
+    children: number;
+    fullName: string;
+    email: string;
+    phone: string;
+    totalPrice?: number;
+    additionalNotes?: string;
+  } | null>(null);
+
+  // Initialize form with context data ONLY ONCE
+  useEffect(() => {
+    if (!isInitialized.current && effectiveContext) {
+      console.log('Initializing form with context:', effectiveContext);
+      
+      const updates: Partial<FormData> = {};
+      
+      if (effectiveContext.type) {
+        updates.bookingType = effectiveContext.type;
+      }
+      if (effectiveContext.id) {
+        updates.selectedItem = effectiveContext.id;
+      }
+      
+      // Handle trip/excursion slug parameters
+      if (tripSlug) {
+        updates.bookingType = "trip";
+        updates.selectedItem = tripSlug;
+      } else if (excursionSlug) {
+        updates.bookingType = "excursion";
+        updates.selectedItem = excursionSlug;
+      }
+      
+      if (Object.keys(updates).length > 0) {
+        setFormData(prev => ({ ...prev, ...updates }));
+      }
+      
+      isInitialized.current = true;
+    }
+  }, []); // Empty dependency array - run only once
+
+  // Handle manual booking type changes
+  const handleBookingTypeChange = (value: BookingType) => {
+    console.log('Manual booking type change:', value);
+    setFormData(prev => ({
       ...prev,
-      [id]: value,
+      bookingType: value,
+      selectedItem: "" // Reset selected item when type changes
     }));
+    setErrors(prev => ({ ...prev, bookingType: undefined, selectedItem: undefined }));
   };
 
-  const startBooking = () => {
-    setCurrentStep("tour-review");
+  // Handle selected item changes
+  const handleSelectedItemChange = (value: string) => {
+    console.log('Selected item change:', value);
+    setFormData(prev => ({ ...prev, selectedItem: value }));
+    setErrors(prev => ({ ...prev, selectedItem: undefined }));
   };
 
-  const goToNextStep = () => {
-    if (currentStep === "tour-review") {
-      setCurrentStep("traveler-info");
-    } else if (currentStep === "traveler-info") {
-      setCurrentStep("payment");
+  useEffect(() => {
+    if (tripSlug) {
+      setFormData(prev => ({
+        ...prev,
+        bookingType: "trip",
+        selectedItem: tripSlug
+      }));
+    }
+  }, [tripSlug]);
+
+  useEffect(() => {
+    if (excursionSlug) {
+      setFormData(prev => ({
+        ...prev,
+        bookingType: "excursion",
+        selectedItem: excursionSlug
+      }));
+    }
+  }, [excursionSlug]);
+
+  // Get selected item details for summary card
+  const getSelectedItemDetails = (): BookingSummaryData | null => {
+    if (!formData.bookingType || !formData.selectedItem) return null;
+
+    if (formData.bookingType === 'trip') {
+      const trip = trips.find(t => t.slug === formData.selectedItem);
+      if (trip) {
+        return {
+          type: 'trip',
+          id: trip.slug,
+          title: trip.title,
+          location: trip.location,
+          duration: trip.duration,
+          price: trip.price,
+          images: trip.images,
+          groupSize: trip.groupSize,
+          rating: trip.rating,
+          reviewCount: trip.reviewCount,
+          tagline: trip.tagline,
+          schedule: trip.schedule,
+          meetingPoint: trip.meetingPoint
+        };
+      }
+    } else if (formData.bookingType === 'excursion') {
+      const excursion = excursions.find(e => e.slug === formData.selectedItem);
+      if (excursion) {
+        return {
+          type: 'excursion',
+          id: excursion.slug,
+          title: excursion.title,
+          location: excursion.location,
+          duration: excursion.duration,
+          price: excursion.price,
+          image: excursion.image,
+          images: excursion.images,
+          groupSize: excursion.groupSize,
+          rating: excursion.rating,
+          reviewCount: excursion.reviewCount,
+          tagline: excursion.tagline,
+          schedule: excursion.schedule,
+          meetingPoint: excursion.meetingPoint
+        };
+      }
+    }
+
+    return null;
+  };
+
+  // Update summary data when selection changes
+  useEffect(() => {
+    const summaryData = getSelectedItemDetails();
+    if (onSummaryDataChange) {
+      onSummaryDataChange(summaryData);
+    }
+  }, [formData.bookingType, formData.selectedItem, onSummaryDataChange]);
+
+  // Get available items based on booking type
+  const getAvailableItems = () => {
+    if (formData.bookingType === "trip") {
+      return transformedTrips;
+    } else if (formData.bookingType === "excursion") {
+      return transformedExcursions;
+    }
+    return [];
+  };
+
+  // Calculate total price
+  const calculateTotal = () => {
+    const selectedItem = getSelectedItemDetails();
+    if (!selectedItem) return 0;
+    
+    const adults = parseInt(formData.adults) || 0;
+    const children = parseInt(formData.children) || 0;
+    
+    return (adults * selectedItem.price) + (children * selectedItem.price * 0.75);
+  };
+
+  // Form validation
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.bookingType) {
+      newErrors.bookingType = "Please select a booking type";
+    }
+
+    if (!formData.selectedItem) {
+      newErrors.selectedItem = "Please select a " + (formData.bookingType || "item");
+    }
+
+    if (!formData.date) {
+      newErrors.date = "Please select a date";
+    }
+
+    if (!formData.adults || parseInt(formData.adults) < 1) {
+      newErrors.adults = "At least 1 adult is required";
+    }
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Get the selected item name
+      const getSelectedItemName = () => {
+        if (formData.bookingType === "trip") {
+          const trip = trips.find(t => t.slug === formData.selectedItem);
+          return trip?.title || "Selected Trip";
+        } else if (formData.bookingType === "excursion") {
+          const excursion = excursions.find(e => e.slug === formData.selectedItem);
+          return excursion?.title || "Selected Excursion";
+        }
+        return "Your Booking";
+      };
+      
+      // Prepare booking details for the modal
+      const bookingDetails = {
+        tripName: getSelectedItemName(),
+        bookingId: `BK-${Date.now()}`,
+        date: formData.date ? format(formData.date, "dd MMM yyyy") : "Date TBD",
+        adults: parseInt(formData.adults),
+        children: parseInt(formData.children),
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        totalPrice: typeof total === "number" ? total : undefined,
+        additionalNotes: formData.additionalNotes || undefined,
+      };
+      
+      // Set booking details and show modal
+      setConfirmedBookingDetails(bookingDetails);
+      setShowConfirmationModal(true);
+      
+      // Reset form
+      setFormData({
+        bookingType: "",
+        selectedItem: "",
+        date: undefined,
+        adults: "1",
+        children: "0",
+        fullName: "",
+        email: "",
+        phone: "",
+        additionalNotes: ""
+      });
+      setErrors({});
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const goToPreviousStep = () => {
-    if (currentStep === "traveler-info") {
-      setCurrentStep("tour-review");
-    } else if (currentStep === "payment") {
-      setCurrentStep("traveler-info");
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  // WhatsApp click handler with validation and identical success UI
+  const handleWhatsAppClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    // In a real app, you would handle the form submission here based on payment method
-    // For now, we'll just show a success toast
-    if (paymentMethod === "card") {
-      toast.success("Card payment successful!", {
-        description: "We will contact you shortly to confirm your booking.",
-      });
-    } else {
-      toast.success("Redirected to PayPal!", {
-        description: "Complete your payment on PayPal to confirm your booking.",
-      });
+    // Reuse existing validation and error styling
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields");
+      return;
     }
 
-    setFormSubmitted(true);
-    setCurrentStep("initial");
-  };
+    // Build detailed WhatsApp message including all booking data
+    const itemLabel = formData.bookingType === "trip" ? "Trip" : "Excursion";
+    const itemName = selectedItemDetails?.title || formData.selectedItem;
+    const dateText = formData.date ? format(formData.date, "dd MMM yyyy") : "";
+    const adultsText = formData.adults;
+    const childrenText = formData.children;
+    const totalText = typeof total === "number" ? `$${total.toFixed(2)}` : "";
 
-  const calculateTotalPrice = () => {
-    const basePrice = 280;
-    const numGuests = parseInt(guests);
-    return basePrice * numGuests;
-  };
-
-  const renderStepIndicator = () => {
-    if (currentStep === "initial") return null;
-
-    const steps = [
-      { id: "tour-review", label: "Tour Review" },
-      { id: "traveler-info", label: "Traveler Info" },
-      { id: "payment", label: "Payment" },
+    const lines: string[] = [
+      "Hello, I'd like to book:",
+      `- Type: ${itemLabel}`,
+      `- ${itemLabel}: ${itemName}`,
+      `- Date: ${dateText}`,
+      `- Adults: ${adultsText}`,
+      `- Children: ${childrenText}`,
+      `- Full Name: ${formData.fullName}`,
+      `- Email: ${formData.email}`,
+      `- Phone: ${formData.phone}`,
     ];
 
-    return (
-      <div className="flex items-center justify-between mb-8">
-        {steps.map((step, index) => (
-          <React.Fragment key={step.id}>
-            <div className="flex flex-col items-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep === step.id ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
-              >
-                {index + 1}
-              </div>
-              <span className="text-xs mt-1">{step.label}</span>
-            </div>
-            {index < steps.length - 1 && (
-              <div className="h-[2px] flex-1 bg-secondary mx-2" />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
-    );
+    if (selectedItemDetails?.price) {
+      lines.push(`- Price per person: $${selectedItemDetails.price}`);
+    }
+    if (totalText) {
+      lines.push(`- Total: ${totalText}`);
+    }
+    if (formData.additionalNotes?.trim()) {
+      lines.push(`- Notes: ${formData.additionalNotes.trim()}`);
+    }
+
+    const message = lines.join("\n");
+
+    // Show the same success confirmation as standard submission
+    toast.success("Booking submitted successfully! We'll contact you soon.");
+
+    // Open WhatsApp in a new tab with properly encoded message
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const renderInitialView = () => (
-    <div className="text-center py-6">
-      <h3 className="text-2xl font-bold mb-2">{tourName}</h3>
-      <div className="flex items-center justify-center gap-1 mb-2">
-        <Star className="fill-yellow-400 text-yellow-400" size={16} />
-        <span className="text-sm font-medium">4.5</span>
-        <span className="text-sm text-muted-foreground">(365 reviews)</span>
-      </div>
-      <p className="text-xl font-bold mb-6">$280/person</p>
-      <Button onClick={startBooking} size="lg">
-        Book Now
-      </Button>
-    </div>
-  );
+  // Handle input changes
+  const handleInputChange = (field: keyof FormData, value: string | Date | undefined) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[field as keyof FormErrors]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+    
+    // Reset selected item when booking type changes
+    if (field === "bookingType") {
+      setFormData(prev => ({ ...prev, selectedItem: "" }));
+    }
+  };
 
-  const renderTourReview = () => (
-    <div className="space-y-6">
-      <div>
-        <h4 className="font-bold mb-2">Tour Highlights</h4>
-        <ul className="list-disc pl-5 space-y-1 text-sm">
-          <li>Guided exploration of stunning desert landscapes</li>
-          <li>Visit to ancient oasis with natural springs</li>
-          <li>Traditional desert lunch included</li>
-          <li>Sunset camel ride experience</li>
-          <li>Professional photography opportunities</li>
-        </ul>
-      </div>
+  const selectedItemDetails = getSelectedItemDetails();
+  const total = calculateTotal();
 
-      <div className="space-y-2">
-        <Label htmlFor="date">Select Date</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !date && "text-muted-foreground",
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Select a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              disabled={(date) => date < new Date()}
-              initialFocus
-              className="p-3 pointer-events-auto"
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+  // Already present in your file:
+  const whatsappNumber = ((import.meta as any).env?.VITE_WHATSAPP_PHONE || "212630079380")
+    .toString()
+    .replace(/^\+/, "")
+    .replace(/\D/g, "");
 
-      <div className="space-y-2">
-        <Label htmlFor="guests">Number of Guests</Label>
-        <Select value={guests} onValueChange={setGuests}>
-          <SelectTrigger id="guests">
-            <SelectValue placeholder="Select number of guests" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">1 Guest</SelectItem>
-            <SelectItem value="2">2 Guests</SelectItem>
-            <SelectItem value="3">3 Guests</SelectItem>
-            <SelectItem value="4">4 Guests</SelectItem>
-            <SelectItem value="5">5 Guests</SelectItem>
-            <SelectItem value="6+">6+ Guests</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+  // New: build message with safe defaults so the button works immediately
+  const itemName =
+    selectedItemDetails?.title ||
+    (formData.bookingType === "excursion"
+      ? "an excursion"
+      : formData.bookingType === "trip"
+      ? "a trip"
+      : "a trip or excursion");
 
-      <div className="border-t pt-4 mt-4">
-        <div className="flex justify-between font-medium">
-          <span>Price per person:</span>
-          <span>$280</span>
-        </div>
-        <div className="flex justify-between font-medium mt-1">
-          <span>Number of guests:</span>
-          <span>{guests}</span>
-        </div>
-        <div className="flex justify-between font-bold text-lg mt-2">
-          <span>Total:</span>
-          <span>${calculateTotalPrice()}</span>
-        </div>
-      </div>
+  const dateText = formData.date ? format(formData.date, "dd MMM yyyy") : "a date";
+  const adultsText = formData.adults && parseInt(formData.adults) > 0 ? formData.adults : "1";
+  const childrenText = formData.children ? formData.children : "0";
 
-      <div className="flex justify-end pt-4">
-        <Button onClick={goToNextStep}>Continue to Traveler Info</Button>
-      </div>
-    </div>
-  );
-
-  const renderTravelerInfo = () => (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="name">Full Name</Label>
-        <Input
-          id="name"
-          placeholder="Enter your full name"
-          value={formData.name}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="email">Email Address</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="Enter your email address"
-          value={formData.email}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
-        <Input
-          id="phone"
-          placeholder="Enter your phone number"
-          value={formData.phone}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="specialRequests">Special Requests (Optional)</Label>
-        <Textarea
-          id="specialRequests"
-          placeholder="Any special requirements or questions?"
-          rows={3}
-          value={formData.specialRequests}
-          onChange={handleInputChange}
-        />
-      </div>
-
-      <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={goToPreviousStep}>
-          Back
-        </Button>
-        <Button onClick={goToNextStep}>Continue to Payment</Button>
-      </div>
-    </div>
-  );
-
-  const renderPayment = () => (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-secondary/50 p-4 rounded-lg mb-6">
-        <h4 className="font-bold mb-2">Order Summary</h4>
-        <div className="flex justify-between text-sm">
-          <span>{tourName}</span>
-          <span>${calculateTotalPrice()}</span>
-        </div>
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>
-            {guests} {parseInt(guests) === 1 ? "guest" : "guests"}
-          </span>
-          <span>{date ? format(date, "MMM d, yyyy") : "No date selected"}</span>
-        </div>
-        <div className="border-t mt-3 pt-3 flex justify-between font-bold">
-          <span>Total</span>
-          <span>${calculateTotalPrice()}</span>
-        </div>
-      </div>
-
-      <div className="space-y-4 mb-6">
-        <Label className="text-base font-medium">Payment Method</Label>
-        <div className="flex flex-col space-y-3">
-          <div
-            className={`flex items-center p-4 border rounded-lg cursor-pointer ${paymentMethod === "card" ? "border-primary bg-primary/5" : "border-border"}`}
-            onClick={() => setPaymentMethod("card")}
-          >
-            <div className="h-5 w-5 rounded-full border border-primary flex items-center justify-center mr-3">
-              {paymentMethod === "card" && (
-                <div className="h-3 w-3 rounded-full bg-primary"></div>
-              )}
-            </div>
-            <div className="flex-1">
-              <div className="font-medium">Credit/Debit Card</div>
-              <div className="text-sm text-muted-foreground">
-                Visa, Mastercard, American Express
-              </div>
-            </div>
-            <div className="flex space-x-2">
-              <img
-                src="https://api.tempo.new/proxy-asset?url=https://storage.googleapis.com/tempo-public-assets/visa.png"
-                alt="Visa"
-                className="w-10 h-6 object-contain"
-              />
-              <img
-                src="https://api.tempo.new/proxy-asset?url=https://storage.googleapis.com/tempo-public-assets/mastercard.png"
-                alt="Mastercard"
-                className="w-10 h-6 object-contain"
-              />
-              <img
-                src="https://api.tempo.new/proxy-asset?url=https://storage.googleapis.com/tempo-public-assets/amex.png"
-                alt="American Express"
-                className="w-10 h-6 object-contain"
-              />
-            </div>
-          </div>
-
-          <div
-            className={`flex items-center p-4 border rounded-lg cursor-pointer ${paymentMethod === "paypal" ? "border-primary bg-primary/5" : "border-border"}`}
-            onClick={() => setPaymentMethod("paypal")}
-          >
-            <div className="h-5 w-5 rounded-full border border-primary flex items-center justify-center mr-3">
-              {paymentMethod === "paypal" && (
-                <div className="h-3 w-3 rounded-full bg-primary"></div>
-              )}
-            </div>
-            <div className="flex-1">
-              <div className="font-medium">PayPal</div>
-              <div className="text-sm text-muted-foreground">
-                Pay securely via PayPal
-              </div>
-            </div>
-            <div className="w-16 h-6 bg-blue-800 rounded flex items-center justify-center text-white text-xs font-bold">
-              PayPal
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {paymentMethod === "card" ? (
-        <>
-          <div className="space-y-2">
-            <Label htmlFor="cardName">Name on Card</Label>
-            <Input
-              id="cardName"
-              placeholder="Enter name as it appears on card"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cardNumber">Card Number</Label>
-            <Input id="cardNumber" placeholder="1234 5678 9012 3456" required />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="expiry">Expiry Date</Label>
-              <Input id="expiry" placeholder="MM/YY" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cvc">CVC</Label>
-              <Input id="cvc" placeholder="123" required />
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-800 mb-4">
-            You'll be redirected to PayPal to complete your payment securely.
-          </p>
-          <Button
-            type="button"
-            className="w-full bg-blue-800 hover:bg-blue-900 text-white"
-            onClick={() => {
-              toast.info("Redirecting to PayPal...");
-              // In a real app, this would redirect to PayPal
-              setTimeout(() => {
-                handleSubmit({ preventDefault: () => {} } as React.FormEvent);
-              }, 1500);
-            }}
-          >
-            Continue to PayPal
-          </Button>
-        </div>
-      )}
-
-      <div className="flex justify-between pt-4">
-        <Button variant="outline" onClick={goToPreviousStep}>
-          Back
-        </Button>
-        {paymentMethod === "card" && (
-          <Button type="submit">Confirm & Pay</Button>
-        )}
-      </div>
-    </form>
-  );
+  const whatsAppText = `Hello, I'd like to book the ${itemName} on ${dateText} for ${adultsText} adults and ${childrenText} children.`;
 
   return (
-    <div className="bg-card p-6 rounded-lg shadow-md">
-      <h3 className="text-2xl font-bold mb-6">Book Your Adventure</h3>
-
-      {formSubmitted ? (
-        <div className="text-center py-8">
-          <div className="mx-auto w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mb-4">
-            <Check className="text-primary" size={24} />
-          </div>
-          <h4 className="text-xl font-bold mb-2">Thank You!</h4>
-          <p className="text-muted-foreground mb-4">
-            Your booking request has been submitted. We'll contact you shortly
-            to confirm the details.
+    <div className="w-full max-w-2xl mx-auto text-foreground">
+      <Card className="shadow-lg border border-border bg-card text-card-foreground">
+        <CardHeader className="text-center pb-6">
+          <CardTitle className="text-2xl font-bold">
+            Book Your Adventure
+          </CardTitle>
+          <p className="mt-2 text-muted-foreground">
+            Choose your perfect desert experience
           </p>
-          <Button onClick={() => setFormSubmitted(false)} className="mt-2">
-            Book Another Tour
-          </Button>
-        </div>
-      ) : (
-        <div>
-          {renderStepIndicator()}
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="bookingType" className="text-sm font-medium">
+                Select Booking Type *
+              </Label>
+              <Select
+                value={formData.bookingType}
+                onValueChange={(value) => handleInputChange("bookingType", value)}
+              >
+                <SelectTrigger 
+                  className={cn(
+                    "w-full h-12 rounded-lg border-2 transition-colors",
+                    "bg-background text-foreground border-input",
+                    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    errors.bookingType && "border-destructive focus-visible:ring-destructive"
+                  )}
+                >
+                  <SelectValue placeholder="Choose booking type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="trip">Trip</SelectItem>
+                  <SelectItem value="excursion">Excursion</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.bookingType && (
+                <p className="text-destructive text-sm mt-1">{errors.bookingType}</p>
+              )}
+            </div>
 
-          {currentStep === "initial" && renderInitialView()}
-          {currentStep === "tour-review" && renderTourReview()}
-          {currentStep === "traveler-info" && renderTravelerInfo()}
-          {currentStep === "payment" && renderPayment()}
-        </div>
+            {formData.bookingType && (
+              <div className="space-y-2">
+                <Label htmlFor="selectedItem" className="text-sm font-medium">
+                  Select a {formData.bookingType === "trip" ? "Trip" : "Excursion"} *
+                </Label>
+                <Select
+                  value={formData.selectedItem}
+                  onValueChange={(value) => handleInputChange("selectedItem", value)}
+                >
+                  <SelectTrigger 
+                    className={cn(
+                      "w-full h-12 rounded-lg border-2 transition-colors",
+                      "bg-background text-foreground border-input",
+                      "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      errors.selectedItem && "border-destructive focus-visible:ring-destructive"
+                    )}
+                  >
+                    <SelectValue placeholder={`Choose a ${formData.bookingType}`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {formData.bookingType === "trip" ? (
+                      <>
+                        <SelectItem value="__placeholder_trip" disabled>Choose a trip</SelectItem>
+                        <SelectItem value="coastal-adventure">Coastal Adventure</SelectItem>
+                        <SelectItem value="mountain-escape">Mountain Escape</SelectItem>
+                        <SelectItem value="city-highlights">City Highlights</SelectItem>
+                        <SelectItem value="cultural-journey">Cultural Journey</SelectItem>
+                        <SelectItem value="sahara-adventure">Sahara Adventure</SelectItem>
+                        <SelectItem value="atlas-mountains-trek">Atlas Mountains Trek</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="__placeholder_excursion" disabled>Choose an excursion</SelectItem>
+                        <SelectItem value="oasis-visit">Oasis Visit</SelectItem>
+                        <SelectItem value="atlas-hike">Atlas Hike</SelectItem>
+                        <SelectItem value="desert-safari">Desert Safari</SelectItem>
+                        <SelectItem value="berber-village-tour">Berber Village Tour</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+                {errors.selectedItem && (
+                  <p className="text-destructive text-sm mt-1">{errors.selectedItem}</p>
+                )}
+              </div>
+            )}
+
+            {/* Selected Item Summary */}
+            {selectedItemDetails && (
+              <Card className="bg-muted border border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold">
+                        {selectedItemDetails.title}
+                      </h3>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1">
+                          <Clock size={14} />
+                          {selectedItemDetails.duration}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin size={14} />
+                          {selectedItemDetails.location}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-primary">
+                        ${selectedItemDetails.price}/person
+                      </p>
+                      <Badge variant="secondary" className="mt-1">
+                        {selectedItemDetails.type === 'trip' ? 'Multi-day' : 'Day Excursion'}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <Separator />
+
+            {/* Personal Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-sm font-medium">
+                  Full Name *
+                </Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => handleInputChange("fullName", e.target.value)}
+                  className={cn(
+                    "h-12 rounded-lg border-2 transition-colors",
+                    "bg-background text-foreground border-input placeholder:text-muted-foreground",
+                    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    errors.fullName && "border-destructive focus-visible:ring-destructive"
+                  )}
+                  placeholder="Enter your full name"
+                />
+                {errors.fullName && (
+                  <p className="text-destructive text-sm mt-1">{errors.fullName}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Email *
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  className={cn(
+                    "h-12 rounded-lg border-2 transition-colors",
+                    "bg-background text-foreground border-input placeholder:text-muted-foreground",
+                    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    errors.email && "border-destructive focus-visible:ring-destructive"
+                  )}
+                  placeholder="Enter your email"
+                />
+                {errors.email && (
+                  <p className="text-destructive text-sm mt-1">{errors.email}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-sm font-medium">
+                Phone Number *
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                className={cn(
+                  "h-12 rounded-lg border-2 transition-colors",
+                  "bg-background text-foreground border-input placeholder:text-muted-foreground",
+                  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  errors.phone && "border-destructive focus-visible:ring-destructive"
+                )}
+                placeholder="Enter your phone number"
+              />
+              {errors.phone && (
+                <p className="text-destructive text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
+
+            {/* Guest Information */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="adults" className="text-sm font-medium">
+                  Number of Adults *
+                </Label>
+                <Select
+                  value={formData.adults}
+                  onValueChange={(value) => handleInputChange("adults", value)}
+                >
+                  <SelectTrigger 
+                    className={cn(
+                      "h-12 rounded-lg border-2 transition-colors",
+                      "bg-background text-foreground border-input",
+                      "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      errors.adults && "border-destructive focus-visible:ring-destructive"
+                    )}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                      <SelectItem key={num} value={num.toString()}>
+                        {num} Adult{num > 1 ? 's' : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.adults && (
+                  <p className="text-destructive text-sm mt-1">{errors.adults}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="children" className="text-sm font-medium">
+                  Number of Children
+                </Label>
+                <Select
+                  value={formData.children}
+                  onValueChange={(value) => handleInputChange("children", value)}
+                >
+                  <SelectTrigger 
+                    className="h-12 rounded-lg border-2 transition-colors bg-background text-foreground border-input focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[0, 1, 2, 3, 4, 5, 6].map((num) => (
+                      <SelectItem key={num} value={num.toString()}>
+                        {num} {num === 1 ? 'Child' : 'Children'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Date Selection */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">
+                Date of Booking *
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full h-12 rounded-lg border-2 justify-start text-left font-normal transition-colors",
+                      "bg-background text-foreground border-input",
+                      "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      !formData.date && "text-muted-foreground",
+                      errors.date && "border-destructive focus-visible:ring-destructive"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.date ? format(formData.date, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formData.date}
+                    onSelect={(date) => handleInputChange("date", date)}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.date && (
+                <p className="text-destructive text-sm mt-1">{errors.date}</p>
+              )}
+            </div>
+
+            {/* Additional Notes */}
+            <div className="space-y-2">
+              <Label htmlFor="additionalNotes" className="text-sm font-medium">
+                Additional Notes
+              </Label>
+              <Textarea
+                id="additionalNotes"
+                value={formData.additionalNotes}
+                onChange={(e) => handleInputChange("additionalNotes", e.target.value)}
+                className="rounded-lg border-2 border-input focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-colors resize-none bg-background text-foreground placeholder:text-muted-foreground"
+                placeholder="Any special requests, dietary restrictions, or additional information..."
+                rows={3}
+              />
+            </div>
+
+            {selectedItemDetails && (
+              <Card className="bg-muted border border-border">
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Adults ({formData.adults} × ${selectedItemDetails.price})</span>
+                      <span>${(parseInt(formData.adults) * selectedItemDetails.price).toFixed(2)}</span>
+                    </div>
+                    {parseInt(formData.children) > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span>Children ({formData.children} × ${(selectedItemDetails.price * 0.75).toFixed(2)})</span>
+                        <span>${(parseInt(formData.children) * selectedItemDetails.price * 0.75).toFixed(2)}</span>
+                      </div>
+                    )}
+                    <Separator />
+                    <div className="flex justify-between font-bold text-lg">
+                      <span>Total</span>
+                      <span className="text-primary">${total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="
+                w-full h-12 rounded-lg
+                bg-[#D4AF37] text-white
+                border-2 border-[#C4902F]
+                hover:bg-[#C4902F]
+                transition-colors transition-shadow duration-200
+                shadow-md hover:shadow-lg
+                focus-visible:outline-none
+                focus-visible:ring-2 focus-visible:ring-ring
+                focus-visible:ring-offset-2 focus-visible:ring-offset-background
+                disabled:opacity-70
+              "
+            >
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </div>
+              ) : (
+                "Book Now"
+              )}
+            </Button>
+
+            {/* WhatsApp Booking Button */}
+            <button
+              type="button"
+              onClick={handleWhatsAppClick}
+              className="
+                w-full h-12 rounded-lg
+                bg-[#25D366] text-white
+                border-2 border-[#25D366]
+                hover:bg-[#1ebc57] hover:border-[#1ebc57]
+                transition-colors transition-shadow duration-200
+                shadow-md hover:shadow-lg
+                focus-visible:outline-none
+                focus-visible:ring-2 focus-visible:ring-[#25D366]
+                focus-visible:ring-offset-2 focus-visible:ring-offset-background
+                flex items-center justify-center gap-2
+                font-semibold text-center
+                no-underline
+              "
+              aria-label="Book via WhatsApp"
+            >
+              {/* WhatsApp Icon SVG */}
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="flex-shrink-0"
+              >
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+              </svg>
+              Book via WhatsApp
+            </button>
+          </form>
+        </CardContent>
+      </Card>
+      
+      {/* Booking Confirmation Modal */}
+      {confirmedBookingDetails && (
+        <BookingConfirmationModal
+          open={showConfirmationModal}
+          onOpenChange={setShowConfirmationModal}
+          bookingDetails={confirmedBookingDetails}
+        />
       )}
     </div>
   );
 };
 
 export default BookingForm;
+
